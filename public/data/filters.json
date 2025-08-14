@@ -1,0 +1,114 @@
+{
+  "filters": [
+    {
+      "id": "original",
+      "name": "Original",
+      "name_vi": "Gốc",
+      "type": "css",
+      "css_filter": "none",
+      "preview_filter": "brightness(100%)",
+      "description": "No effects applied",
+      "description_vi": "Không áp dụng hiệu ứng",
+      "icon": "🖼️"
+    },
+    {
+      "id": "bw",
+      "name": "Black & White",
+      "name_vi": "Đen trắng",
+      "type": "css",
+      "css_filter": "grayscale(100%)",
+      "preview_filter": "grayscale(100%)",
+      "description": "Classic black and white",
+      "description_vi": "Đen trắng cổ điển",
+      "icon": "⚫"
+    },
+    {
+      "id": "warm",
+      "name": "Warm",
+      "name_vi": "Ấm áp",
+      "type": "css",
+      "css_filter": "sepia(30%) saturate(120%) hue-rotate(15deg)",
+      "preview_filter": "sepia(30%) saturate(120%)",
+      "description": "Warm color tone",
+      "description_vi": "Tông màu ấm áp",
+      "icon": "🌅"
+    },
+    {
+      "id": "cold",
+      "name": "Cold",
+      "name_vi": "Lạnh",
+      "type": "css",
+      "css_filter": "hue-rotate(180deg) saturate(120%)",
+      "preview_filter": "hue-rotate(180deg) saturate(120%)",
+      "description": "Cool color tone",
+      "description_vi": "Tông màu lạnh",
+      "icon": "❄️"
+    },
+    {
+      "id": "vintage",
+      "name": "Vintage",
+      "name_vi": "Cổ điển",
+      "type": "css",
+      "css_filter": "sepia(50%) contrast(120%) brightness(90%)",
+      "preview_filter": "sepia(50%) contrast(120%)",
+      "description": "Vintage style",
+      "description_vi": "Phong cách cổ điển",
+      "icon": "📷"
+    },
+    {
+      "id": "cartoon",
+      "name": "Cartoon",
+      "name_vi": "Hoạt hình",
+      "type": "css",
+      "css_filter": "contrast(150%) saturate(150%) brightness(110%)",
+      "preview_filter": "contrast(150%) saturate(150%)",
+      "description": "Cartoon effect",
+      "description_vi": "Hiệu ứng hoạt hình",
+      "icon": "🎨"
+    },
+    {
+      "id": "blur",
+      "name": "Soft Focus",
+      "name_vi": "Mờ nhẹ",
+      "type": "css",
+      "css_filter": "blur(1px) brightness(110%)",
+      "preview_filter": "blur(0.5px) brightness(110%)",
+      "description": "Soft focus effect",
+      "description_vi": "Làm mờ nhẹ",
+      "icon": "🌸"
+    },
+    {
+      "id": "dramatic",
+      "name": "Dramatic",
+      "name_vi": "Kịch tính",
+      "type": "css",
+      "css_filter": "contrast(140%) saturate(80%) brightness(95%)",
+      "preview_filter": "contrast(140%) saturate(80%)",
+      "description": "High contrast",
+      "description_vi": "Tương phản cao",
+      "icon": "⚡"
+    },
+    {
+      "id": "retro",
+      "name": "Retro",
+      "name_vi": "Retro",
+      "type": "css",
+      "css_filter": "sepia(40%) hue-rotate(320deg) saturate(120%)",
+      "preview_filter": "sepia(40%) hue-rotate(320deg)",
+      "description": "Retro style",
+      "description_vi": "Phong cách retro",
+      "icon": "🕺"
+    },
+    {
+      "id": "neon",
+      "name": "Neon",
+      "name_vi": "Neon",
+      "type": "css",
+      "css_filter": "saturate(200%) contrast(120%) brightness(110%)",
+      "preview_filter": "saturate(200%) contrast(120%)",
+      "description": "Neon effect",
+      "description_vi": "Hiệu ứng neon",
+      "icon": "🌈"
+    }
+  ]
+}

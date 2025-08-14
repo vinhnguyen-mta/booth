@@ -1,0 +1,43 @@
+{
+  "vouchers": [
+    {
+      "code": "12345678",
+      "discount_type": "fixed",
+      "discount_value": 20000,
+      "min_amount": 50000,
+      "max_uses": 100,
+      "used_count": 0,
+      "valid_from": "2024-01-01",
+      "valid_until": "2024-12-31",
+      "description": "Welcome discount",
+      "description_vi": "Giảm giá chào mừng",
+      "active": true
+    },
+    {
+      "code": "SAVE10K",
+      "discount_type": "fixed",
+      "discount_value": 10000,
+      "min_amount": 30000,
+      "max_uses": 200,
+      "used_count": 0,
+      "valid_from": "2024-01-01",
+      "valid_until": "2024-12-31",
+      "description": "10K discount",
+      "description_vi": "Giảm 10K",
+      "active": true
+    },
+    {
+      "code": "NEWUSER",
+      "discount_type": "percentage",
+      "discount_value": 15,
+      "min_amount": 70000,
+      "max_uses": 50,
+      "used_count": 0,
+      "valid_from": "2024-01-01",
+      "valid_until": "2024-12-31",
+      "description": "New user 15% off",
+      "description_vi": "Người dùng mới giảm 15%",
+      "active": true
+    }
+  ]
+}

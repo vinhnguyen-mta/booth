@@ -1,0 +1,40 @@
+{
+  "payment_methods": [
+    {
+      "id": "cash",
+      "name": "Cash Payment",
+      "name_vi": "Thanh toán tiền mặt",
+      "type": "cash",
+      "icon": "banknote",
+      "color": "green",
+      "description": "Pay with cash bills",
+      "description_vi": "Thanh toán bằng tiền mặt",
+      "enabled": true,
+      "processing_time": "instant"
+    },
+    {
+      "id": "qr",
+      "name": "QR Code Payment",
+      "name_vi": "Thanh toán QR",
+      "type": "qr",
+      "icon": "smartphone",
+      "color": "primary",
+      "description": "Scan QR code to pay",
+      "description_vi": "Quét mã QR để thanh toán",
+      "enabled": true,
+      "processing_time": "1-2 minutes"
+    },
+    {
+      "id": "card",
+      "name": "Card Payment",
+      "name_vi": "Thanh toán thẻ",
+      "type": "card",
+      "icon": "credit-card",
+      "color": "blue",
+      "description": "Pay with credit/debit card",
+      "description_vi": "Thanh toán bằng thẻ tín dụng/ghi nợ",
+      "enabled": false,
+      "processing_time": "instant"
+    }
+  ]
+}
