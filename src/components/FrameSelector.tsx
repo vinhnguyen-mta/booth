@@ -1,16 +1,16 @@
 // UPDATE: New reusable FrameSelector component
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Frame, getFrames, formatPrice } from '../services/api';
-import styles from './FrameSelector.module.css';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Frame, getFrames, formatPrice } from "../services/api";
+import styles from "./FrameSelector.module.css";
 
 interface FrameSelectorProps {
   selectedFrame: Frame | null;
   onFrameSelect: (frame: Frame) => void;
   onBack?: () => void;
   onContinue?: () => void;
-  language: 'en' | 'vi';
+  language: "en" | "vi";
 }
 
 export const FrameSelector: React.FC<FrameSelectorProps> = ({
@@ -18,7 +18,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
   onFrameSelect,
   onBack,
   onContinue,
-  language
+  language,
 }) => {
   const [frames, setFrames] = useState<Frame[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,17 +33,20 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
       const framesData = await getFrames();
       setFrames(framesData);
     } catch (error) {
-      console.error('Error loading frames:', error);
+      console.error("Error loading frames:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const scroll = (dir: 'left' | 'right') => {
+  const scroll = (dir: "left" | "right") => {
     const el = containerRef.current;
     if (!el) return;
     const amount = Math.max(el.clientWidth * 0.5, 200);
-    el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' });
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
   };
 
   if (loading) {
@@ -76,20 +79,23 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.06 }}
-              className={`${styles.item} ${isSelected ? styles.selected : ''}`}
+              className={`${styles.item} ${isSelected ? styles.selected : ""}`}
               onClick={() => onFrameSelect(frame)}
             >
               <div className={styles.titleBadge}>
-                <span>{language === 'vi' ? frame.name_vi : frame.name}</span>
+                <span>{language === "vi" ? frame.name_vi : frame.name}</span>
               </div>
 
               <div className={styles.previewWrap}>
-                <div className={styles.frameStroke} dangerouslySetInnerHTML={{ __html: frame.svg }} />
+                <div
+                  className={styles.frameStroke}
+                  dangerouslySetInnerHTML={{ __html: frame.svg }}
+                />
               </div>
 
               <div className={styles.footer}>
                 <div className={styles.panels}>
-                  {frame.panels} {language === 'vi' ? 'ảnh' : 'cut'}
+                  {frame.panels} {language === "vi" ? "ảnh" : "cut"}
                 </div>
                 <div className={styles.price}>{formatPrice(frame.price)}₫</div>
               </div>
@@ -113,7 +119,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
           aria-label="Next"
           onClick={() => {
             if (selectedFrame && onContinue) onContinue();
-            else scroll('right');
+            else scroll("right");
           }}
         >
           <ChevronRight className="w-5 h-5" />

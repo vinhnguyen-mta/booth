@@ -48,10 +48,14 @@
 }
 
 .summaryCard {
-  background: linear-gradient(90deg, rgba(0,22,122,0.04), rgba(2,86,190,0.02));
+  background: linear-gradient(
+    90deg,
+    rgba(0, 22, 122, 0.04),
+    rgba(2, 86, 190, 0.02)
+  );
   border-radius: 12px;
   padding: 18px;
-  box-shadow: 0 12px 34px rgba(2,6,23,0.04);
+  box-shadow: 0 12px 34px rgba(2, 6, 23, 0.04);
   cursor: pointer;
 }
 .summaryRow {
@@ -59,18 +63,41 @@
   justify-content: space-between;
   align-items: center;
 }
-.muted { color: #475569; font-size: 14px; }
-.totalValue { font-weight: 700; color: #111827; }
-.bold { font-weight: 700; color: #111827; }
-.finalValue { font-size: 20px; color: var(--primary); font-weight: 800; margin-left: 8px; }
+.muted {
+  color: #475569;
+  font-size: 14px;
+}
+.totalValue {
+  font-weight: 700;
+  color: #111827;
+}
+.bold {
+  font-weight: 700;
+  color: #111827;
+}
+.finalValue {
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 800;
+  margin-left: 8px;
+}
 
-.summaryDivider { border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px; margin-top: 10px; }
-.discountRow { color: #059669; display:flex; justify-content:space-between; margin-top:8px; }
+.summaryDivider {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.discountRow {
+  color: #059669;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
 
 /* payment methods grid */
 .methodsGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 .methodCard {
@@ -80,14 +107,33 @@
   padding: 12px;
   background: var(--card-bg);
   border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.04);
-  transition: box-shadow .18s ease, transform .12s ease;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
   cursor: pointer;
 }
-.methodCard:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(2,6,23,0.06); }
-.methodIcon { width: 56px; height: 56px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:#f8fafc; }
-.methodTitle { font-weight:700; color:#0f172a; }
-.methodDesc { font-size:12px; color:#6b7280; }
+.methodCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+}
+.methodIcon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.methodTitle {
+  font-weight: 700;
+  color: #0f172a;
+}
+.methodDesc {
+  font-size: 12px;
+  color: #6b7280;
+}
 
 /* right column: voucher + keypad */
 .rightCol {
@@ -100,31 +146,44 @@
   background: var(--card-bg);
   padding: 18px;
   border-radius: 12px;
-  border: 1px solid rgba(2,6,23,0.04);
+  border: 1px solid rgba(2, 6, 23, 0.04);
 }
-.voucherLabel { font-weight:700; color: #0f172a; margin-bottom:8px; display:block; }
-.voucherRow { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.voucherLabel {
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+  display: block;
+}
+.voucherRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
 .voucherInput {
   flex: 1;
   background: linear-gradient(90deg, var(--primary), var(--primary));
   height: 44px;
   border-radius: 28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
   padding: 0 16px;
-  font-weight:700;
-  box-shadow: 0 8px 28px rgba(0,22,122,0.12);
+  font-weight: 700;
+  box-shadow: 0 8px 28px rgba(0, 22, 122, 0.12);
 }
-.voucherText { letter-spacing: 0.12em; font-family: monospace; }
+.voucherText {
+  letter-spacing: 0.12em;
+  font-family: monospace;
+}
 
 /* keypad wrapper: override NumericKeypad button styles if present */
 .keypadWrap {
   width: 160px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .keypadWrap button {
   background: var(--primary) !important;
@@ -132,7 +191,7 @@
   border-radius: 999px !important;
   width: 44px !important;
   height: 44px !important;
-  box-shadow: 0 8px 22px rgba(2,6,23,0.12) !important;
+  box-shadow: 0 8px 22px rgba(2, 6, 23, 0.12) !important;
   border: none !important;
   margin: 6px !important;
   font-weight: 700 !important;
@@ -149,19 +208,34 @@
   border-radius: 999px;
   background: var(--primary);
   color: #fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow: 0 10px 30px rgba(2,6,23,0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.14);
   border: none;
   z-index: 30;
 }
-.navButtonLeft { left: 18px; }
-.navButtonRight { right: 18px; }
+.navButtonLeft {
+  left: 18px;
+}
+.navButtonRight {
+  right: 18px;
+}
 
 /* responsive adjustments */
 @media (max-width: 980px) {
-  .content { grid-template-columns: 1fr; }
-  .keypadWrap { width: 100%; display:flex; justify-content:center; margin-top:12px; }
-  .voucherRow { flex-direction: column; align-items: stretch; gap: 12px; }
+  .content {
+    grid-template-columns: 1fr;
+  }
+  .keypadWrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .voucherRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }

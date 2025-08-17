@@ -9,9 +9,9 @@ export interface AppState {
   capturedVideos: string[]; // UPDATE: Add video support
   selectedFilter: string;
   finalImage: string | null;
-  paymentMethod: 'cash' | 'qr' | null;
-  paymentStatus: 'pending' | 'processing' | 'success' | 'failed';
-  language: 'en' | 'vi';
+  paymentMethod: "cash" | "qr" | null;
+  paymentStatus: "pending" | "processing" | "success" | "failed";
+  language: "en" | "vi";
   totalPrice: number;
 }
 

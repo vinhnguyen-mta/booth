@@ -1,33 +1,32 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
-import { Layout } from '../components/Layout';
-import { translations } from '../i18n/translations';
-import { FrameSelector } from '../components/FrameSelector';
-
+import React from "react";
+import { motion } from "framer-motion";
+import { Plus, Minus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
+import { Layout } from "../components/Layout";
+import { translations } from "../i18n/translations";
+import { FrameSelector } from "../components/FrameSelector";
 
 export const ChooseQuantity: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    language, 
-    selectedFrame, 
-    quantity, 
-    setQuantity, 
-    totalPrice, 
-    setCurrentStep 
+  const {
+    language,
+    selectedFrame,
+    quantity,
+    setQuantity,
+    totalPrice,
+    setCurrentStep,
   } = useAppStore();
   const t = translations[language];
 
   const handleBack = () => {
     setCurrentStep(1);
-    navigate('/choose-frame');
+    navigate("/choose-frame");
   };
 
   const handleContinue = () => {
     setCurrentStep(3);
-    navigate('/payment');
+    navigate("/payment");
   };
 
   const incrementQuantity = () => {
@@ -43,11 +42,11 @@ export const ChooseQuantity: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN').format(price);
+    return new Intl.NumberFormat("vi-VN").format(price);
   };
 
   if (!selectedFrame) {
-    navigate('/choose-frame');
+    navigate("/choose-frame");
     return null;
   }
 
@@ -80,13 +79,12 @@ export const ChooseQuantity: React.FC = () => {
 
         <div className="max-w-5xl w-full mx-auto px-6">
           <div className="flex flex-col items-center justify-center gap-8">
-
             {/* Frame preview */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-2xl p-8 flex items-center justify-center"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             >
               <div
                 className="w-56 md:w-64 lg:w-72 h-[320px] lg:h-[420px] flex items-center justify-center"
@@ -121,8 +119,12 @@ export const ChooseQuantity: React.FC = () => {
               </div>
 
               <div className="text-center mt-2">
-                <div className={`font-bold text-base text-[#00167a]`} style={{ fontSize: '2.5rem' }}>
-                  {formatPrice(totalPrice)}{t.currency}
+                <div
+                  className={`font-bold text-base text-[#00167a]`}
+                  style={{ fontSize: "2.5rem" }}
+                >
+                  {formatPrice(totalPrice)}
+                  {t.currency}
                 </div>
               </div>
             </div>

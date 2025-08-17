@@ -1,11 +1,11 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Camera, Sparkles, Play } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
-import { Layout } from '../components/Layout';
-import { translations } from '../i18n/translations';
-import styles from './Landing.module.css';
+import React from "react";
+import { motion } from "framer-motion";
+import { Camera, Sparkles, Play } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
+import { Layout } from "../components/Layout";
+import { translations } from "../i18n/translations";
+import styles from "./Landing.module.css";
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -14,12 +14,15 @@ export const Landing: React.FC = () => {
 
   const handleStart = () => {
     setCurrentStep(1);
-    navigate('/choose-frame');
+    navigate("/choose-frame");
   };
 
   return (
     <Layout>
-      <div className="flex-1 flex flex-col items-center justify-center px-6" style={{ backgroundColor: '#95adff1c' }}>
+      <div
+        className="flex-1 flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: "#95adff1c" }}
+      >
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -38,7 +41,7 @@ export const Landing: React.FC = () => {
                 src="/assets/logo-start.png"
                 alt="PhotoBooth Logo"
                 className={styles.logo}
-                style={{ display: 'block' }}
+                style={{ display: "block" }}
               />
             </div>
           </motion.div>

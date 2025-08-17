@@ -1,30 +1,31 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ToggleLeft, ToggleRight, Check, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
-import { Layout } from '../components/Layout';
-import { FilterSelector } from '../components/FilterSelector';
-import { SkinSmoothingControl } from '../components/SkinSmoothingControl';
-import { translations } from '../i18n/translations';
+import React, { useRef, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ToggleLeft, ToggleRight, Check, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
+import { Layout } from "../components/Layout";
+import { FilterSelector } from "../components/FilterSelector";
+import { SkinSmoothingControl } from "../components/SkinSmoothingControl";
+import { translations } from "../i18n/translations";
 
 export const Filters: React.FC = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const { 
-    language, 
-    selectedFrame, 
+
+  const {
+    language,
+    selectedFrame,
     capturedImages,
     selectedFilter,
     setSelectedFilter,
     setFinalImage,
-    setCurrentStep
+    setCurrentStep,
   } = useAppStore();
   const t = translations[language];
-  
+
   const [fillMode, setFillMode] = useState(false);
-  const [processedImage, setProcessedImage] = useState<HTMLCanvasElement | null>(null);
+  const [processedImage, setProcessedImage] =
+    useState<HTMLCanvasElement | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(true);
 
@@ -44,18 +45,19 @@ export const Filters: React.FC = () => {
   }, [selectedFilter, selectedImages, fillMode]);
 
   const generatePreview = async () => {
-    if (!canvasRef.current || !selectedFrame || selectedImages.length === 0) return;
+    if (!canvasRef.current || !selectedFrame || selectedImages.length === 0)
+      return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size based on frame layout
     canvas.width = 800;
-    canvas.height = selectedFrame.layout === 'strip-4' ? 1200 : 800;
+    canvas.height = selectedFrame.layout === "strip-4" ? 1200 : 800;
 
     // Clear canvas
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw images based on layout
@@ -65,7 +67,7 @@ export const Filters: React.FC = () => {
     await drawFrameOverlay(ctx, selectedFrame.svg);
 
     // Save final image
-    const finalImageData = canvas.toDataURL('image/jpeg', 0.9);
+    const finalImageData = canvas.toDataURL("image/jpeg", 0.9);
     setFinalImage(finalImageData);
     setFinalImage(finalImageData);
   };
@@ -73,9 +75,9 @@ export const Filters: React.FC = () => {
   const drawImagesWithLayout = async (
     ctx: CanvasRenderingContext2D,
     images: string[],
-    layout: string
+    layout: string,
   ) => {
-    const imagePromises = images.map(src => {
+    const imagePromises = images.map((src) => {
       return new Promise<HTMLImageElement>((resolve) => {
         const img = new Image();
         img.onload = () => resolve(img);
@@ -86,47 +88,79 @@ export const Filters: React.FC = () => {
     const loadedImages = await Promise.all(imagePromises);
 
     // Apply filter
-    if (selectedFilter !== 'original') {
+    if (selectedFilter !== "original") {
       const filter = getFilterCSS(selectedFilter);
       ctx.filter = filter;
     }
 
     switch (layout) {
-      case 'single':
+      case "single":
         if (loadedImages[0]) {
-          drawImageFit(ctx, loadedImages[0], 50, 50, 700, 700, fillMode ? 'cover' : 'contain');
+          drawImageFit(
+            ctx,
+            loadedImages[0],
+            50,
+            50,
+            700,
+            700,
+            fillMode ? "cover" : "contain",
+          );
         }
         break;
-      
-      case 'strip-4':
+
+      case "strip-4":
         loadedImages.slice(0, 4).forEach((img, index) => {
           const y = 50 + index * 275;
-          drawImageFit(ctx, img, 100, y, 600, 250, fillMode ? 'cover' : 'contain');
+          drawImageFit(
+            ctx,
+            img,
+            100,
+            y,
+            600,
+            250,
+            fillMode ? "cover" : "contain",
+          );
         });
         break;
-      
-      case 'grid-2x2':
+
+      case "grid-2x2":
         loadedImages.slice(0, 4).forEach((img, index) => {
           const col = index % 2;
           const row = Math.floor(index / 2);
           const x = 50 + col * 350;
           const y = 50 + row * 350;
-          drawImageFit(ctx, img, x, y, 300, 300, fillMode ? 'cover' : 'contain');
+          drawImageFit(
+            ctx,
+            img,
+            x,
+            y,
+            300,
+            300,
+            fillMode ? "cover" : "contain",
+          );
         });
         break;
 
-      case 'grid-3x3':
+      case "grid-3x3":
         loadedImages.slice(0, 9).forEach((img, index) => {
           const col = index % 3;
           const row = Math.floor(index / 3);
           const x = 50 + col * 233;
           const y = 50 + row * 233;
-          drawImageFit(ctx, img, x, y, 200, 200, fillMode ? 'cover' : 'contain');
+          drawImageFit(
+            ctx,
+            img,
+            x,
+            y,
+            200,
+            200,
+            fillMode ? "cover" : "contain",
+          );
         });
         break;
     }
 
-    ctx.filter = 'none';
+    ctx.filter = "none";
   };
 
   const drawImageFit = (
@@ -136,14 +170,14 @@ export const Filters: React.FC = () => {
     y: number,
     width: number,
     height: number,
-    mode: 'cover' | 'contain'
+    mode: "cover" | "contain",
   ) => {
     const imgAspect = img.naturalWidth / img.naturalHeight;
     const boxAspect = width / height;
-    
+
     let drawWidth, drawHeight, drawX, drawY;
-    
-    if (mode === 'cover') {
+
+    if (mode === "cover") {
       if (imgAspect > boxAspect) {
         drawHeight = height;
         drawWidth = height * imgAspect;
@@ -168,18 +202,21 @@ export const Filters: React.FC = () => {
         drawY = y;
       }
     }
-    
+
     ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
   };
 
-  const drawFrameOverlay = async (ctx: CanvasRenderingContext2D, svgString: string) => {
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+  const drawFrameOverlay = async (
+    ctx: CanvasRenderingContext2D,
+    svgString: string,
+  ) => {
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
     const url = URL.createObjectURL(svgBlob);
-    
+
     return new Promise<void>((resolve) => {
       const img = new Image();
       img.onload = () => {
-        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalCompositeOperation = "source-over";
         ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
         URL.revokeObjectURL(url);
         resolve();
@@ -190,32 +227,32 @@ export const Filters: React.FC = () => {
 
   const getFilterCSS = (filterId: string): string => {
     const filters: Record<string, string> = {
-      'bw': 'grayscale(100%)',
-      'warm': 'sepia(30%) saturate(120%) hue-rotate(15deg)',
-      'cold': 'hue-rotate(180deg) saturate(120%)',
-      'vintage': 'sepia(50%) contrast(120%) brightness(90%)',
-      'cartoon': 'contrast(150%) saturate(150%) brightness(110%)',
-      'blur': 'blur(1px) brightness(110%)',
-      'dramatic': 'contrast(140%) saturate(80%) brightness(95%)',
-      'retro': 'sepia(40%) hue-rotate(320deg) saturate(120%)',
-      'neon': 'saturate(200%) contrast(120%) brightness(110%)'
+      bw: "grayscale(100%)",
+      warm: "sepia(30%) saturate(120%) hue-rotate(15deg)",
+      cold: "hue-rotate(180deg) saturate(120%)",
+      vintage: "sepia(50%) contrast(120%) brightness(90%)",
+      cartoon: "contrast(150%) saturate(150%) brightness(110%)",
+      blur: "blur(1px) brightness(110%)",
+      dramatic: "contrast(140%) saturate(80%) brightness(95%)",
+      retro: "sepia(40%) hue-rotate(320deg) saturate(120%)",
+      neon: "saturate(200%) contrast(120%) brightness(110%)",
     };
-    return filters[filterId] || 'none';
+    return filters[filterId] || "none";
   };
 
   const handleBack = () => {
     setCurrentStep(4);
-    navigate('/capture');
+    navigate("/capture");
   };
 
   const handleContinue = () => {
     setCurrentStep(6);
-    navigate('/preview');
+    navigate("/preview");
   };
-  
+
   const handleImageProcessed = (image: HTMLCanvasElement) => {
     setProcessedImage(image);
-    const finalImageData = image.toDataURL('image/jpeg', 0.95);
+    const finalImageData = image.toDataURL("image/jpeg", 0.95);
     setFinalImage(finalImageData);
   };
 
@@ -229,10 +266,11 @@ export const Filters: React.FC = () => {
     const newSelection = [...selectedImages];
     newSelection.splice(slotIndex, 1);
     setSelectedImages(newSelection);
-  };0
+  };
+  0;
 
   if (!selectedFrame || capturedImages.length === 0) {
-    navigate('/capture');
+    navigate("/capture");
     return null;
   }
 
@@ -251,18 +289,18 @@ export const Filters: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
             {t.back}
           </button>
-          
+
           <div className="text-center">
             <h1 className="text-2xl font-bold text-dark">{t.filtersTitle}</h1>
             <p className="text-gray-600 compact-text">{t.filtersSubtitle}</p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             {/* Fill mode toggle */}
             <button
               onClick={() => setFillMode(!fillMode)}
               className="flex items-center gap-2 px-3 py-2 bg-white/80 hover:bg-white border border-gray-200 rounded-lg transition-colors"
-              title={fillMode ? 'Switch to Contain' : 'Fill Frame'}
+              title={fillMode ? "Switch to Contain" : "Fill Frame"}
             >
               {fillMode ? (
                 <ToggleRight className="w-5 h-5 text-primary" />
@@ -270,7 +308,7 @@ export const Filters: React.FC = () => {
                 <ToggleLeft className="w-5 h-5 text-gray-400" />
               )}
               <span className="compact-text font-medium">
-                {language === 'vi' ? 'Lấp đầy' : 'Fill'}
+                {language === "vi" ? "Lấp đầy" : "Fill"}
               </span>
             </button>
 
@@ -280,7 +318,7 @@ export const Filters: React.FC = () => {
               className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-lg transition-colors"
             >
               <span className="compact-text font-medium">
-                {language === 'vi' ? 'Chọn ảnh' : 'Select Photos'}
+                {language === "vi" ? "Chọn ảnh" : "Select Photos"}
               </span>
             </button>
           </div>
@@ -293,12 +331,11 @@ export const Filters: React.FC = () => {
             {showImageSelector && (
               <div className="mb-6 p-4 bg-white rounded-lg border-2 border-primary/20">
                 <h3 className="font-semibold text-dark mb-4">
-                  {language === 'vi' 
+                  {language === "vi"
                     ? `Chọn ${requiredSlots} ảnh cho khung:`
-                    : `Select ${requiredSlots} photos for frame:`
-                  }
+                    : `Select ${requiredSlots} photos for frame:`}
                 </h3>
-                
+
                 {/* Selected Images Slots */}
                 <div className="grid grid-cols-4 gap-3 mb-4">
                   {Array.from({ length: requiredSlots }).map((_, slotIndex) => (
@@ -338,7 +375,9 @@ export const Filters: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => {
-                        const nextEmptySlot = selectedImages.findIndex(img => !img);
+                        const nextEmptySlot = selectedImages.findIndex(
+                          (img) => !img,
+                        );
                         if (nextEmptySlot !== -1) {
                           handleImageSelect(image, nextEmptySlot);
                         }
@@ -372,7 +411,9 @@ export const Filters: React.FC = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-lg w-full"
               >
-                <div className={`image-container aspect-[4/5] bg-white rounded-lg shadow-lg relative ${fillMode ? 'fill-mode' : ''}`}>
+                <div
+                  className={`image-container aspect-[4/5] bg-white rounded-lg shadow-lg relative ${fillMode ? "fill-mode" : ""}`}
+                >
                   <canvas
                     ref={canvasRef}
                     className="w-full h-full rounded-lg"
@@ -388,18 +429,24 @@ export const Filters: React.FC = () => {
             {/* Skin Smoothing Control */}
             <div className="mb-6">
               <SkinSmoothingControl
-                image={selectedImages.length > 0 ? (() => {
-                  const img = new Image();
-                  img.src = selectedImages[0];
-                  return img;
-                })() : null}
+                image={
+                  selectedImages.length > 0
+                    ? (() => {
+                        const img = new Image();
+                        img.src = selectedImages[0];
+                        return img;
+                      })()
+                    : null
+                }
                 onImageProcessed={handleImageProcessed}
                 language={language}
               />
             </div>
-            
-            <h3 className="text-base font-semibold text-dark mb-4">{t.filters}</h3>
-            
+
+            <h3 className="text-base font-semibold text-dark mb-4">
+              {t.filters}
+            </h3>
+
             <FilterSelector
               selectedFilter={selectedFilter}
               onFilterSelect={setSelectedFilter}

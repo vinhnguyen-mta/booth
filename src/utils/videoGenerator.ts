@@ -6,14 +6,14 @@ export interface VideoGenerationOptions {
   fps: number;
   width: number;
   height: number;
-  format: 'webm' | 'mp4';
+  format: "webm" | "mp4";
   quality: number; // 0-1
 }
 
 export interface VideoFrame {
   image: HTMLCanvasElement | HTMLImageElement;
   duration: number; // seconds
-  transition?: 'fade' | 'slide' | 'zoom' | 'none';
+  transition?: "fade" | "slide" | "zoom" | "none";
 }
 
 export class VideoGenerator {
@@ -23,8 +23,8 @@ export class VideoGenerator {
   private recordedChunks: Blob[] = [];
 
   constructor() {
-    this.canvas = document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d')!;
+    this.canvas = document.createElement("canvas");
+    this.ctx = this.canvas.getContext("2d")!;
   }
 
   async generateVideo(
@@ -34,28 +34,32 @@ export class VideoGenerator {
       fps: 30,
       width: 1920,
       height: 1080,
-      format: 'webm',
-      quality: 0.9
-    }
+      format: "webm",
+      quality: 0.9,
+    },
   ): Promise<Blob> {
     this.canvas.width = options.width;
     this.canvas.height = options.height;
 
     // Setup MediaRecorder for canvas stream
     const stream = this.canvas.captureStream(options.fps);
-    
-    const mimeType = options.format === 'webm' ? 'video/webm;codecs=vp9' : 'video/mp4;codecs=h264';
-    
+
+    const mimeType =
+      options.format === "webm"
+        ? "video/webm;codecs=vp9"
+        : "video/mp4;codecs=h264";
+
     this.mediaRecorder = new MediaRecorder(stream, {
       mimeType: mimeType,
-      videoBitsPerSecond: options.width * options.height * options.fps * options.quality
+      videoBitsPerSecond:
+        options.width * options.height * options.fps * options.quality,
     });
 
     this.recordedChunks = [];
 
     return new Promise((resolve, reject) => {
       if (!this.mediaRecorder) {
-        reject(new Error('MediaRecorder not initialized'));
+        reject(new Error("MediaRecorder not initialized"));
         return;
       }
 
@@ -71,22 +75,27 @@ export class VideoGenerator {
       };
 
       this.mediaRecorder.onerror = (event) => {
-        reject(new Error('MediaRecorder error'));
+        reject(new Error("MediaRecorder error"));
       };
 
       // Start recording
       this.mediaRecorder.start();
 
       // Render frames
-      this.renderFrames(frames, options).then(() => {
-        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-          this.mediaRecorder.stop();
-        }
-      }).catch(reject);
+      this.renderFrames(frames, options)
+        .then(() => {
+          if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
+            this.mediaRecorder.stop();
+          }
+        })
+        .catch(reject);
     });
   }
 
-  private async renderFrames(frames: VideoFrame[], options: VideoGenerationOptions): Promise<void> {
+  private async renderFrames(
+    frames: VideoFrame[],
+    options: VideoGenerationOptions,
+  ): Promise<void> {
     const frameInterval = 1000 / options.fps; // ms per frame
     let currentTime = 0;
     const totalDuration = options.duration * 1000; // convert to ms
@@ -94,20 +103,27 @@ export class VideoGenerator {
     while (currentTime < totalDuration) {
       const progress = currentTime / totalDuration;
       await this.renderFrame(frames, progress, options);
-      
+
       // Wait for next frame
-      await new Promise(resolve => setTimeout(resolve, frameInterval));
+      await new Promise((resolve) => setTimeout(resolve, frameInterval));
       currentTime += frameInterval;
     }
   }
 
-  private async renderFrame(frames: VideoFrame[], progress: number, options: VideoGenerationOptions): Promise<void> {
+  private async renderFrame(
+    frames: VideoFrame[],
+    progress: number,
+    options: VideoGenerationOptions,
+  ): Promise<void> {
     // Clear canvas
-    this.ctx.fillStyle = '#000000';
+    this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, options.width, options.height);
 
     // Calculate which frame(s) to show based on progress
-    const totalFrameDuration = frames.reduce((sum, frame) => sum + frame.duration, 0);
+    const totalFrameDuration = frames.reduce(
+      (sum, frame) => sum + frame.duration,
+      0,
+    );
     let currentFrameTime = 0;
     let activeFrameIndex = 0;
     let frameProgress = 0;
@@ -116,7 +132,9 @@ export class VideoGenerator {
       const frameEndTime = currentFrameTime + frames[i].duration;
       if (progress * totalFrameDuration <= frameEndTime) {
         activeFrameIndex = i;
-        frameProgress = (progress * totalFrameDuration - currentFrameTime) / frames[i].duration;
+        frameProgress =
+          (progress * totalFrameDuration - currentFrameTime) /
+          frames[i].duration;
         break;
       }
       currentFrameTime = frameEndTime;
@@ -128,7 +146,12 @@ export class VideoGenerator {
     // Apply transition effects
     if (nextFrame && frameProgress > 0.8) {
       const transitionProgress = (frameProgress - 0.8) / 0.2; // Last 20% of frame
-      this.applyTransition(currentFrame, nextFrame, transitionProgress, options);
+      this.applyTransition(
+        currentFrame,
+        nextFrame,
+        transitionProgress,
+        options,
+      );
     } else {
       this.drawFrame(currentFrame.image, options);
     }
@@ -138,10 +161,10 @@ export class VideoGenerator {
     currentFrame: VideoFrame,
     nextFrame: VideoFrame,
     progress: number,
-    options: VideoGenerationOptions
+    options: VideoGenerationOptions,
   ): void {
-    switch (currentFrame.transition || 'fade') {
-      case 'fade':
+    switch (currentFrame.transition || "fade") {
+      case "fade":
         this.ctx.globalAlpha = 1 - progress;
         this.drawFrame(currentFrame.image, options);
         this.ctx.globalAlpha = progress;
@@ -149,7 +172,7 @@ export class VideoGenerator {
         this.ctx.globalAlpha = 1;
         break;
 
-      case 'slide':
+      case "slide":
         const slideOffset = progress * options.width;
         this.ctx.save();
         this.ctx.translate(-slideOffset, 0);
@@ -159,7 +182,7 @@ export class VideoGenerator {
         this.ctx.restore();
         break;
 
-      case 'zoom':
+      case "zoom":
         const scale = 1 + progress * 0.2;
         this.ctx.save();
         this.ctx.translate(options.width / 2, options.height / 2);
@@ -168,7 +191,7 @@ export class VideoGenerator {
         this.ctx.globalAlpha = 1 - progress;
         this.drawFrame(currentFrame.image, options);
         this.ctx.restore();
-        
+
         this.ctx.globalAlpha = progress;
         this.drawFrame(nextFrame.image, options);
         this.ctx.globalAlpha = 1;
@@ -179,11 +202,14 @@ export class VideoGenerator {
     }
   }
 
-  private drawFrame(image: HTMLCanvasElement | HTMLImageElement, options: VideoGenerationOptions): void {
+  private drawFrame(
+    image: HTMLCanvasElement | HTMLImageElement,
+    options: VideoGenerationOptions,
+  ): void {
     // Calculate aspect ratio and fit image
     const imageWidth = image.width || (image as HTMLCanvasElement).width;
     const imageHeight = image.height || (image as HTMLCanvasElement).height;
-    
+
     const scaleX = options.width / imageWidth;
     const scaleY = options.height / imageHeight;
     const scale = Math.min(scaleX, scaleY); // contain mode
@@ -199,23 +225,23 @@ export class VideoGenerator {
   // Create video from single image with effects
   async createSlideshow(
     images: (HTMLCanvasElement | HTMLImageElement)[],
-    options: Partial<VideoGenerationOptions> = {}
+    options: Partial<VideoGenerationOptions> = {},
   ): Promise<Blob> {
     const defaultOptions: VideoGenerationOptions = {
       duration: Math.max(6, images.length * 1.5),
       fps: 30,
       width: 1920,
       height: 1080,
-      format: 'webm',
+      format: "webm",
       quality: 0.9,
-      ...options
+      ...options,
     };
 
     const frameDuration = defaultOptions.duration / images.length;
     const frames: VideoFrame[] = images.map((image, index) => ({
       image,
       duration: frameDuration,
-      transition: index < images.length - 1 ? 'fade' : 'none'
+      transition: index < images.length - 1 ? "fade" : "none",
     }));
 
     return this.generateVideo(frames, defaultOptions);

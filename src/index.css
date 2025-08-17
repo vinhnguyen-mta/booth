@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 /* Root layout - no scroll, full viewport */
-html, body {
+html,
+body {
   height: 100dvh;
   overflow-y: auto; /* UPDATE: Allow smooth scrolling */
   margin: 0;
@@ -20,24 +21,24 @@ html, body {
   html {
     font-size: clamp(14px, 1.2vw, 18px);
   }
-  
+
   .step-container {
     height: 100dvh;
     display: flex;
     flex-direction: column;
   }
-  
+
   .step-header {
     flex-shrink: 0;
     height: clamp(80px, 8vh, 120px);
   }
-  
+
   .step-content {
     flex: 1;
     min-height: 0;
     overflow: hidden;
   }
-  
+
   .step-footer {
     flex-shrink: 0;
     height: clamp(80px, 8vh, 100px);
@@ -48,15 +49,15 @@ html, body {
   html {
     font-size: clamp(16px, 1.1vw, 20px);
   }
-  
+
   .step-container {
     height: 100dvh;
   }
-  
+
   .step-header {
     height: clamp(100px, 9vh, 140px);
   }
-  
+
   .step-footer {
     height: clamp(90px, 8vh, 120px);
   }
@@ -97,7 +98,7 @@ html, body {
 }
 
 .safe-area-guide::before {
-  content: 'Safe Area';
+  content: "Safe Area";
   position: absolute;
   top: -20px;
   left: 0;
@@ -111,7 +112,7 @@ html, body {
   .frame-viewport {
     max-height: 85vh;
   }
-  
+
   /* Tối ưu cho 1920x1080 */
   .container {
     max-width: 1800px;
@@ -122,12 +123,12 @@ html, body {
   .frame-viewport {
     max-height: 88vh;
   }
-  
+
   /* Tối ưu cho 2560x1440 (2K) */
   .container {
     max-width: 2400px;
   }
-  
+
   /* Tăng kích thước font cho màn hình lớn */
   html {
     font-size: 18px;
@@ -138,12 +139,12 @@ html, body {
   .frame-viewport {
     max-height: 90vh;
   }
-  
+
   /* Tối ưu cho 3840x2160 (4K) */
   .container {
     max-width: 3600px;
   }
-  
+
   /* Tăng kích thước font cho 4K */
   html {
     font-size: 20px;
@@ -155,7 +156,7 @@ html, body {
   .frame-viewport {
     max-height: 85vh;
   }
-  
+
   /* Tối ưu cho 1920x1080 */
   .container {
     max-width: 1800px;
@@ -166,12 +167,12 @@ html, body {
   .frame-viewport {
     max-height: 88vh;
   }
-  
+
   /* Tối ưu cho 2560x1440 (2K) */
   .container {
     max-width: 2400px;
   }
-  
+
   /* Tăng kích thước font cho màn hình lớn */
   html {
     font-size: 18px;
@@ -182,12 +183,12 @@ html, body {
   .frame-viewport {
     max-height: 90vh;
   }
-  
+
   /* Tối ưu cho 3840x2160 (4K) */
   .container {
     max-width: 3600px;
   }
-  
+
   /* Tăng kích thước font cho 4K */
   html {
     font-size: 20px;
@@ -371,21 +372,21 @@ canvas.high-quality {
     max-width: none !important;
     max-height: none !important;
   }
-  
+
   .print-preview-container {
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
     max-height: none !important;
   }
-  
+
   .frame-canvas {
     width: 100% !important;
     height: 100% !important;
     border: none !important;
     box-shadow: none !important;
   }
-  
+
   .print:hidden {
     display: none !important;
   }
@@ -408,7 +409,7 @@ canvas.high-quality {
   .frame-viewport {
     max-height: 97vh;
   }
-  
+
   .print:hidden {
     display: none !important;
   }
@@ -449,32 +450,37 @@ canvas.high-quality {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #F34B52;
+  background: #f34b52;
   cursor: pointer;
   border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
 .skin-smoothing-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 .skin-smoothing-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #F34B52;
+  background: #f34b52;
   cursor: pointer;
   border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
 /* Video controls styling */
 .video-controls {
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    transparent 100%
+  );
 }
 
 .video-progress {
@@ -492,10 +498,10 @@ canvas.high-quality {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #F34B52;
+  background: #f34b52;
   cursor: pointer;
   border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* PC Optimized Styles for 24-27 inch screens */
@@ -508,7 +514,7 @@ canvas.high-quality {
     margin: 0 auto;
     padding: 0 2rem;
   }
-  
+
   .pc-header {
     display: flex;
     align-items: center;
@@ -520,7 +526,7 @@ canvas.high-quality {
     flex-shrink: 0;
     height: 120px;
   }
-  
+
   .pc-content {
     flex: 1;
     display: flex;
@@ -529,7 +535,7 @@ canvas.high-quality {
     padding: 3rem 0;
     min-height: 0;
   }
-  
+
   .pc-grid {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
@@ -538,7 +544,7 @@ canvas.high-quality {
     max-width: 1400px;
     align-items: center;
   }
-  
+
   .pc-card {
     background: white;
     border-radius: 2rem;
@@ -547,12 +553,12 @@ canvas.high-quality {
     border: 1px solid rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
   }
-  
+
   .pc-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
   }
-  
+
   .pc-title {
     font-size: 2.5rem;
     font-weight: 800;
@@ -560,13 +566,13 @@ canvas.high-quality {
     margin-bottom: 0.5rem;
     line-height: 1.2;
   }
-  
+
   .pc-subtitle {
     font-size: 1.25rem;
     color: #6b7280;
     font-weight: 500;
   }
-  
+
   .header-back-btn {
     display: flex;
     align-items: center;
@@ -580,13 +586,13 @@ canvas.high-quality {
     background: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.1);
   }
-  
+
   .header-back-btn:hover {
-    color: #F34B52;
+    color: #f34b52;
     background: white;
     transform: translateX(-3px);
   }
-  
+
   .header-title {
     text-align: center;
     flex: 1;
@@ -598,30 +604,30 @@ canvas.high-quality {
     max-width: 2400px;
     padding: 0 3rem;
   }
-  
+
   .pc-header {
     height: 140px;
     padding: 2.5rem 0;
   }
-  
+
   .pc-content {
     padding: 4rem 0;
   }
-  
+
   .pc-grid {
     gap: 5rem;
     max-width: 1800px;
   }
-  
+
   .pc-card {
     padding: 4rem;
     border-radius: 2.5rem;
   }
-  
+
   .pc-title {
     font-size: 3rem;
   }
-  
+
   .pc-subtitle {
     font-size: 1.5rem;
   }
@@ -650,13 +656,17 @@ canvas.high-quality {
 }
 
 .frame-preview-box::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(244, 75, 82, 0.05) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(244, 75, 82, 0.05) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -690,7 +700,7 @@ canvas.high-quality {
 .frame-price {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #F34B52;
+  color: #f34b52;
 }
 
 /* Controls Card Styles */
@@ -744,7 +754,7 @@ canvas.high-quality {
 }
 
 .counter-btn-primary {
-  background: #F34B52;
+  background: #f34b52;
   color: white;
 }
 
@@ -753,7 +763,7 @@ canvas.high-quality {
 }
 
 .counter-btn-secondary {
-  background: #14B8A6;
+  background: #14b8a6;
   color: white;
 }
 
@@ -776,20 +786,25 @@ canvas.high-quality {
 }
 
 .counter-display::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   z-index: -1;
 }
 
 .counter-display-primary {
-  background: linear-gradient(135deg, #F34B52 0%, #e63946 100%);
+  background: linear-gradient(135deg, #f34b52 0%, #e63946 100%);
 }
 
 .counter-display-secondary {
-  background: linear-gradient(135deg, #14B8A6 0%, #0d9488 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
 }
 
 .counter-description {
@@ -804,7 +819,13 @@ canvas.high-quality {
 }
 
 .total-price-card {
-  background: linear-gradient(135deg, #F34B52 0%, #e63946 20%, #14B8A6 80%, #0d9488 100%);
+  background: linear-gradient(
+    135deg,
+    #f34b52 0%,
+    #e63946 20%,
+    #14b8a6 80%,
+    #0d9488 100%
+  );
   border-radius: 1.5rem;
   padding: 2rem;
   text-align: center;
@@ -813,13 +834,18 @@ canvas.high-quality {
 }
 
 .total-price-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
   pointer-events: none;
 }
 
@@ -844,7 +870,10 @@ canvas.high-quality {
 .compact-grid {
   display: grid;
   gap: clamp(0.5rem, 2vw, 1.5rem);
-  grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 25vw, 300px), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(200px, 25vw, 300px), 1fr)
+  );
 }
 
 .compact-spacing {
@@ -867,7 +896,7 @@ canvas.high-quality {
   .section-grid.two-column {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .section-grid.sidebar {
     grid-template-columns: 1fr 320px;
   }
@@ -899,7 +928,9 @@ canvas.high-quality {
   z-index: 50;
   bottom: 1.25rem;
   backdrop-filter: blur(8px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
   border: none;
   cursor: pointer;
@@ -911,7 +942,9 @@ canvas.high-quality {
 
 .fixed-nav-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .fixed-nav-back {
@@ -926,12 +959,12 @@ canvas.high-quality {
 
 .fixed-nav-back:hover {
   background: white;
-  color: #F34B52;
+  color: #f34b52;
 }
 
 .fixed-nav-continue {
   right: 1.25rem;
-  background: #F34B52;
+  background: #f34b52;
   color: white;
 }
 
@@ -950,7 +983,7 @@ canvas.high-quality {
     font-size: 1rem;
     border-radius: 1rem;
   }
-  
+
   .nav-button-text {
     font-size: 1rem;
   }
@@ -966,16 +999,17 @@ canvas.high-quality {
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
-  
+
   .no-print {
     display: none !important;
   }
-  
+
   .print-only {
     display: block !important;
   }
-  
-  canvas, img {
+
+  canvas,
+  img {
     max-width: 100% !important;
     height: auto !important;
     page-break-inside: avoid;

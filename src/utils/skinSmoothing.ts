@@ -14,8 +14,10 @@ export class SkinSmoothingProcessor {
   private initialized = false;
 
   constructor() {
-    this.canvas = document.createElement('canvas');
-    this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+    this.canvas = document.createElement("canvas");
+    this.gl =
+      this.canvas.getContext("webgl") ||
+      this.canvas.getContext("experimental-webgl");
     this.program = null;
   }
 
@@ -82,8 +84,14 @@ export class SkinSmoothingProcessor {
       }
     `;
 
-    const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
-    const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+    const vertexShader = this.createShader(
+      this.gl.VERTEX_SHADER,
+      vertexShaderSource,
+    );
+    const fragmentShader = this.createShader(
+      this.gl.FRAGMENT_SHADER,
+      fragmentShaderSource,
+    );
 
     if (!vertexShader || !fragmentShader) return false;
 
@@ -95,7 +103,7 @@ export class SkinSmoothingProcessor {
     this.gl.linkProgram(this.program);
 
     if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
-      console.error('Shader program failed to link');
+      console.error("Shader program failed to link");
       return false;
     }
 
@@ -113,7 +121,10 @@ export class SkinSmoothingProcessor {
     this.gl.compileShader(shader);
 
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-      console.error('Shader compilation error:', this.gl.getShaderInfoLog(shader));
+      console.error(
+        "Shader compilation error:",
+        this.gl.getShaderInfoLog(shader),
+      );
       this.gl.deleteShader(shader);
       return null;
     }
@@ -122,19 +133,27 @@ export class SkinSmoothingProcessor {
   }
 
   // TODO: Replace with real face detection API (MediaPipe/TensorFlow.js)
-  private async detectFaces(imageData: ImageData): Promise<Array<{x: number, y: number, width: number, height: number}>> {
+  private async detectFaces(
+    imageData: ImageData,
+  ): Promise<Array<{ x: number; y: number; width: number; height: number }>> {
     // Mock face detection - in real implementation, use MediaPipe Face Detection
-    return [{
-      x: imageData.width * 0.25,
-      y: imageData.height * 0.2,
-      width: imageData.width * 0.5,
-      height: imageData.height * 0.6
-    }];
+    return [
+      {
+        x: imageData.width * 0.25,
+        y: imageData.height * 0.2,
+        width: imageData.width * 0.5,
+        height: imageData.height * 0.6,
+      },
+    ];
   }
 
   async applySkinSmoothing(
     image: HTMLImageElement | HTMLCanvasElement,
-    options: SkinSmoothingOptions = { amount: 40, preserveDetails: true, faceDetection: true }
+    options: SkinSmoothingOptions = {
+      amount: 40,
+      preserveDetails: true,
+      faceDetection: true,
+    },
   ): Promise<HTMLCanvasElement> {
     if (!this.initialized && !this.initWebGL()) {
       // Fallback to canvas-based smoothing
@@ -152,21 +171,36 @@ export class SkinSmoothingProcessor {
     // Create texture from image
     const texture = this.gl.createTexture();
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      image,
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.gl.CLAMP_TO_EDGE,
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_T,
+      this.gl.CLAMP_TO_EDGE,
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      this.gl.LINEAR,
+    );
 
     // Setup geometry
     const positions = new Float32Array([
-      -1, -1, 1, -1, -1, 1,
-      -1, 1, 1, -1, 1, 1
+      -1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1,
     ]);
 
-    const texCoords = new Float32Array([
-      0, 1, 1, 1, 0, 0,
-      0, 0, 1, 1, 1, 0
-    ]);
+    const texCoords = new Float32Array([0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0]);
 
     const positionBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
@@ -180,23 +214,50 @@ export class SkinSmoothingProcessor {
     this.gl.useProgram(this.program);
 
     // Set uniforms
-    const amountLocation = this.gl.getUniformLocation(this.program, 'u_amount');
-    const resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
-    
+    const amountLocation = this.gl.getUniformLocation(this.program, "u_amount");
+    const resolutionLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_resolution",
+    );
+
     this.gl.uniform1f(amountLocation, options.amount);
-    this.gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
+    this.gl.uniform2f(
+      resolutionLocation,
+      this.canvas.width,
+      this.canvas.height,
+    );
 
     // Set attributes
-    const positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
-    const texCoordLocation = this.gl.getAttribLocation(this.program, 'a_texCoord');
+    const positionLocation = this.gl.getAttribLocation(
+      this.program,
+      "a_position",
+    );
+    const texCoordLocation = this.gl.getAttribLocation(
+      this.program,
+      "a_texCoord",
+    );
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
     this.gl.enableVertexAttribArray(positionLocation);
-    this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(
+      positionLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0,
+    );
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
     this.gl.enableVertexAttribArray(texCoordLocation);
-    this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(
+      texCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0,
+    );
 
     // Render
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -208,11 +269,11 @@ export class SkinSmoothingProcessor {
   // Fallback canvas-based smoothing
   private fallbackSmoothing(
     image: HTMLImageElement | HTMLCanvasElement,
-    options: SkinSmoothingOptions
+    options: SkinSmoothingOptions,
   ): HTMLCanvasElement {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d')!;
-    
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+
     canvas.width = image.width || (image as HTMLCanvasElement).width;
     canvas.height = image.height || (image as HTMLCanvasElement).height;
 
@@ -221,8 +282,8 @@ export class SkinSmoothingProcessor {
     ctx.drawImage(image, 0, 0);
 
     // Reset filter and overlay original for detail preservation
-    ctx.filter = 'none';
-    ctx.globalCompositeOperation = 'overlay';
+    ctx.filter = "none";
+    ctx.globalCompositeOperation = "overlay";
     ctx.globalAlpha = 0.3;
     ctx.drawImage(image, 0, 0);
 

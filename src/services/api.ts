@@ -50,7 +50,7 @@ export interface PaymentMethod {
 
 export interface Voucher {
   code: string;
-  discount_type: 'fixed' | 'percentage';
+  discount_type: "fixed" | "percentage";
   discount_value: number;
   min_amount: number;
   max_uses: number;
@@ -66,11 +66,11 @@ export interface PaymentResponse {
   paymentId: string;
   qrDataUrl?: string;
   expiresAt: string;
-  status: 'pending' | 'processing' | 'success' | 'failed';
+  status: "pending" | "processing" | "success" | "failed";
 }
 
 export interface PaymentStatus {
-  status: 'pending' | 'processing' | 'success' | 'failed';
+  status: "pending" | "processing" | "success" | "failed";
   receivedAmount: number;
   amount: number;
   currency: string;
@@ -96,18 +96,18 @@ export async function getAppConfig(): Promise<AppConfig> {
     maxPhotoCount: 10,
     minPhotoCount: 1,
     maxQuantity: 10,
-    minQuantity: 1
+    minQuantity: 1,
   };
 }
 
 // TODO: Replace with real API call
 export async function getFrames(): Promise<Frame[]> {
   try {
-    const response = await fetch('/data/frames.json');
+    const response = await fetch("/data/frames.json");
     const data = await response.json();
     return data.frames;
   } catch (error) {
-    console.error('Error loading frames:', error);
+    console.error("Error loading frames:", error);
     return [];
   }
 }
@@ -115,11 +115,11 @@ export async function getFrames(): Promise<Frame[]> {
 // TODO: Replace with real API call
 export async function getFilters(): Promise<Filter[]> {
   try {
-    const response = await fetch('/data/filters.json');
+    const response = await fetch("/data/filters.json");
     const data = await response.json();
     return data.filters;
   } catch (error) {
-    console.error('Error loading filters:', error);
+    console.error("Error loading filters:", error);
     return [];
   }
 }
@@ -127,59 +127,64 @@ export async function getFilters(): Promise<Filter[]> {
 // TODO: Replace with real API call
 export async function getPaymentMethods(): Promise<PaymentMethod[]> {
   try {
-    const response = await fetch('/data/payment_methods.json');
+    const response = await fetch("/data/payment_methods.json");
     const data = await response.json();
-    return data.payment_methods.filter(method => method.enabled);
+    return data.payment_methods.filter((method) => method.enabled);
   } catch (error) {
-    console.error('Error loading payment methods:', error);
+    console.error("Error loading payment methods:", error);
     return [];
   }
 }
 
 // TODO: Replace with real API call
-export async function createPayment(amount: number, currency: string = 'VND'): Promise<PaymentResponse> {
+export async function createPayment(
+  amount: number,
+  currency: string = "VND",
+): Promise<PaymentResponse> {
   // Mock payment creation
   const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
-  
+
   // Mock QR code generation
-  let qrDataUrl = '';
+  let qrDataUrl = "";
   try {
-    const QRCode = await import('qrcode');
+    const QRCode = await import("qrcode");
     const paymentUrl = `https://payment.example.com/pay/${paymentId}?amount=${amount}&currency=${currency}`;
     qrDataUrl = await QRCode.default.toDataURL(paymentUrl, {
       width: 256,
       margin: 2,
       color: {
-        dark: '#F34B52',
-        light: '#FFFFFF'
-      }
+        dark: "#F34B52",
+        light: "#FFFFFF",
+      },
     });
   } catch (error) {
-    console.error('Error generating QR code:', error);
+    console.error("Error generating QR code:", error);
   }
-  
+
   return {
     paymentId,
     qrDataUrl,
     expiresAt,
-    status: 'pending'
+    status: "pending",
   };
 }
 
 // TODO: Replace with real API call
-export async function checkPaymentStatus(paymentId: string): Promise<PaymentStatus> {
+export async function checkPaymentStatus(
+  paymentId: string,
+): Promise<PaymentStatus> {
   // Mock payment status check
   // In real implementation, this would check with payment gateway
-  
+
   // Simulate random payment completion after some time
   const isCompleted = Math.random() > 0.3; // 70% chance of completion
-  
+
   return {
-    status: isCompleted ? 'success' : 'pending',
+    status: isCompleted ? "success" : "pending",
     receivedAmount: isCompleted ? 100000 : 0,
     amount: 100000,
-    currency: 'VND'
+    currency: "VND",
   };
 }
 
@@ -187,14 +192,14 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
 export async function uploadPhoto(file: File): Promise<UploadResponse> {
   // Mock photo upload
   // In real implementation, this would upload to cloud storage
-  
+
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = () => {
       resolve({
         url: reader.result as string,
         filename: file.name,
-        size: file.size
+        size: file.size,
       });
     };
     reader.readAsDataURL(file);
@@ -202,17 +207,20 @@ export async function uploadPhoto(file: File): Promise<UploadResponse> {
 }
 
 // TODO: Replace with real API call
-export async function uploadVideo(blob: Blob, filename: string = 'video.webm'): Promise<UploadResponse> {
+export async function uploadVideo(
+  blob: Blob,
+  filename: string = "video.webm",
+): Promise<UploadResponse> {
   // Mock video upload
   // In real implementation, this would upload to cloud storage
-  
+
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = () => {
       resolve({
         url: reader.result as string,
         filename,
-        size: blob.size
+        size: blob.size,
       });
     };
     reader.readAsDataURL(blob);
@@ -220,55 +228,61 @@ export async function uploadVideo(blob: Blob, filename: string = 'video.webm'): 
 }
 
 // TODO: Replace with real API call
-export async function validateVoucher(code: string): Promise<VoucherValidation> {
+export async function validateVoucher(
+  code: string,
+): Promise<VoucherValidation> {
   try {
-    const response = await fetch('/data/vouchers.json');
+    const response = await fetch("/data/vouchers.json");
     const data = await response.json();
-    const voucher = data.vouchers.find((v: Voucher) => 
-      v.code.toLowerCase() === code.toLowerCase() && v.active
+    const voucher = data.vouchers.find(
+      (v: Voucher) => v.code.toLowerCase() === code.toLowerCase() && v.active,
     );
-    
+
     if (voucher) {
       // Check if voucher is still valid
       const now = new Date();
       const validFrom = new Date(voucher.valid_from);
       const validUntil = new Date(voucher.valid_until);
-      
-      if (now >= validFrom && now <= validUntil && voucher.used_count < voucher.max_uses) {
+
+      if (
+        now >= validFrom &&
+        now <= validUntil &&
+        voucher.used_count < voucher.max_uses
+      ) {
         return {
           valid: true,
           discountAmount: voucher.discount_value,
-          message: voucher.description
+          message: voucher.description,
         };
       }
     }
-    
+
     return {
       valid: false,
       discountAmount: 0,
-      message: 'Invalid or expired voucher code'
+      message: "Invalid or expired voucher code",
     };
   } catch (error) {
-    console.error('Error validating voucher:', error);
+    console.error("Error validating voucher:", error);
     return {
       valid: false,
       discountAmount: 0,
-      message: 'Error validating voucher'
+      message: "Error validating voucher",
     };
   }
 }
 
 // Utility function to format price
-export function formatPrice(price: number, currency: string = 'VND'): string {
-  return new Intl.NumberFormat('vi-VN').format(price);
+export function formatPrice(price: number, currency: string = "VND"): string {
+  return new Intl.NumberFormat("vi-VN").format(price);
 }
 
 // Utility function to calculate discount
 export function calculateDiscount(
-  originalAmount: number, 
-  voucher: { discount_type: string; discount_value: number }
+  originalAmount: number,
+  voucher: { discount_type: string; discount_value: number },
 ): number {
-  if (voucher.discount_type === 'percentage') {
+  if (voucher.discount_type === "percentage") {
     return Math.round(originalAmount * (voucher.discount_value / 100));
   } else {
     return voucher.discount_value;

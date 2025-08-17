@@ -24,7 +24,7 @@
 }
 
 .title::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -80,11 +80,19 @@
 }
 
 @keyframes loadProgress {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 @keyframes moveHeart {
-  from { left: 0; }
-  to { left: calc(100% - 20px); }
+  from {
+    left: 0;
+  }
+  to {
+    left: calc(100% - 20px);
+  }
 }

@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { AppState } from '../types';
-import { Frame, Filter } from '../services/api';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { AppState } from "../types";
+import { Frame, Filter } from "../services/api";
 
 interface AppStore extends AppState {
   setCurrentStep: (step: number) => void;
@@ -15,9 +15,11 @@ interface AppStore extends AppState {
   clearCapturedVideos: () => void;
   setSelectedFilter: (filter: string) => void;
   setFinalImage: (image: string | null) => void;
-  setPaymentMethod: (method: 'cash' | 'qr' | null) => void;
-  setPaymentStatus: (status: 'pending' | 'processing' | 'success' | 'failed') => void;
-  setLanguage: (language: 'en' | 'vi') => void;
+  setPaymentMethod: (method: "cash" | "qr" | null) => void;
+  setPaymentStatus: (
+    status: "pending" | "processing" | "success" | "failed",
+  ) => void;
+  setLanguage: (language: "en" | "vi") => void;
   calculateTotalPrice: () => void;
   resetSession: () => void;
   // UPDATE: Payment guard for capture access
@@ -36,11 +38,11 @@ const initialState: AppState = {
   photoCount: 8, // Mặc định chụp 8 ảnh từ API config
   capturedImages: [],
   capturedVideos: [], // UPDATE: Add video array
-  selectedFilter: 'original',
+  selectedFilter: "original",
   finalImage: null,
   paymentMethod: null,
-  paymentStatus: 'pending',
-  language: 'vi',
+  paymentStatus: "pending",
+  language: "vi",
   totalPrice: 0,
 };
 
@@ -48,68 +50,70 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set, get) => ({
       ...initialState,
-      
+
       setCurrentStep: (step) => set({ currentStep: step }),
-      
+
       setSelectedFrame: (frame) => {
         set({ selectedFrame: frame });
         get().calculateTotalPrice();
       },
-      
+
       setQuantity: (quantity) => {
         set({ quantity });
         get().calculateTotalPrice();
       },
-      
+
       setPhotoCount: (photoCount) => set({ photoCount }),
-      
-      addCapturedImage: (image) => set((state) => ({ 
-        capturedImages: [...state.capturedImages, image] 
-      })),
-      
+
+      addCapturedImage: (image) =>
+        set((state) => ({
+          capturedImages: [...state.capturedImages, image],
+        })),
+
       // UPDATE: Add video capture support
-      addCapturedVideo: (video) => set((state) => ({ 
-        capturedVideos: [...state.capturedVideos, video] 
-      })),
-      
+      addCapturedVideo: (video) =>
+        set((state) => ({
+          capturedVideos: [...state.capturedVideos, video],
+        })),
+
       clearCapturedImages: () => set({ capturedImages: [] }),
-      
+
       clearCapturedVideos: () => set({ capturedVideos: [] }),
-      
+
       setSelectedFilter: (filter) => set({ selectedFilter: filter }),
-      
+
       setFinalImage: (image) => set({ finalImage: image }),
-      
+
       setPaymentMethod: (method) => set({ paymentMethod: method }),
-      
+
       setPaymentStatus: (status) => set({ paymentStatus: status }),
-      
+
       setLanguage: (language) => set({ language }),
-      
+
       calculateTotalPrice: () => {
         const { selectedFrame, quantity } = get();
         const totalPrice = selectedFrame ? selectedFrame.price * quantity : 0;
         set({ totalPrice });
       },
-      
+
       resetSession: () => set(initialState),
-      
+
       // UPDATE: Payment guard implementation
       canAccessCapture: () => {
         const { paymentStatus } = get();
-        return paymentStatus === 'success';
+        return paymentStatus === "success";
       },
-      
+
       // UPDATE: Video support
       capturedVideos: [],
-      
+
       // UPDATE: Fullscreen state
       isFullscreen: false,
-      
+
       setFullscreen: (isFullscreen) => set({ isFullscreen }),
     }),
     {
-      name: 'photobooth-store',
+      name: "photobooth-store",
       partialize: (state) => ({
         selectedFrame: state.selectedFrame,
         quantity: state.quantity,
@@ -120,6 +124,6 @@ export const useAppStore = create<AppStore>()(
         // UPDATE: Persist fullscreen state across navigation
         isFullscreen: state.isFullscreen,
       }),
-    }
-  )
+    },
+  ),
 );

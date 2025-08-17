@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Delete } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Delete } from "lucide-react";
 
 interface NumericKeypadProps {
   onNumberClick: (number: string) => void;
@@ -11,9 +11,9 @@ interface NumericKeypadProps {
 export const NumericKeypad: React.FC<NumericKeypadProps> = ({
   onNumberClick,
   onClear,
-  onConfirm
+  onConfirm,
 }) => {
-  const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
   return (
     <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
@@ -29,7 +29,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           {number}
         </motion.button>
       ))}
-      
+
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -40,17 +40,17 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
       >
         <Delete className="w-5 h-5" />
       </motion.button>
-      
+
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
-        onClick={() => onNumberClick('0')}
+        onClick={() => onNumberClick("0")}
         className="w-16 h-16 bg-primary hover:bg-primary/90 text-white font-bold text-xl rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/30"
       >
         0
       </motion.button>
-      
+
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}

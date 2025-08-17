@@ -2,4 +2,4 @@
 // This file is deprecated, data now loaded from /data/frames.json via API service
 
 // Data now loaded from API service
-export { getFrames, getFilters } from '../services/api';
+export { getFrames, getFilters } from "../services/api";

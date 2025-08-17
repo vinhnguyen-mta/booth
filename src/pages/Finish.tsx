@@ -1,22 +1,18 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Download, Share, QrCode, RotateCcw, Printer } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
-import { Layout } from '../components/Layout';
-import { translations } from '../i18n/translations';
-import QRCode from 'qrcode';
+import React, { useEffect } from "react";
+import { motion } from "framer-motion";
+import { Download, Share, QrCode, RotateCcw, Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
+import { Layout } from "../components/Layout";
+import { translations } from "../i18n/translations";
+import QRCode from "qrcode";
 
 export const Finish: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    language, 
-    finalImage,
-    resetSession 
-  } = useAppStore();
+  const { language, finalImage, resetSession } = useAppStore();
   const t = translations[language];
 
-  const [shareQR, setShareQR] = React.useState<string>('');
+  const [shareQR, setShareQR] = React.useState<string>("");
 
   useEffect(() => {
     generateShareQR();
@@ -30,50 +26,50 @@ export const Finish: React.FC = () => {
         width: 200,
         margin: 2,
         color: {
-          dark: '#F34B52',
-          light: '#FFFFFF'
-        }
+          dark: "#F34B52",
+          light: "#FFFFFF",
+        },
       });
       setShareQR(qrDataUrl);
     } catch (error) {
-      console.error('Error generating share QR:', error);
+      console.error("Error generating share QR:", error);
     }
   };
 
   const handleDownload = () => {
     if (!finalImage) return;
-    
+
     // Tạo canvas chất lượng cao để xuất
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     const img = new Image();
     img.onload = () => {
       // Sử dụng độ phân giải cao nhất
       const scale = Math.min(window.devicePixelRatio || 1, 3); // Tối đa 3x
       canvas.width = img.naturalWidth * scale;
       canvas.height = img.naturalHeight * scale;
-      
+
       // Cài đặt chất lượng cao nhất
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingQuality = "high";
       ctx.scale(scale, scale);
-      
+
       // Vẽ ảnh với chất lượng cao
       ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-      
+
       // Xuất với chất lượng cao nhất (PNG không nén)
       canvas.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
+          const link = document.createElement("a");
           link.download = `photobooth-${new Date().toISOString().slice(0, 10)}-${Date.now()}.png`;
           link.href = url;
           link.click();
           URL.revokeObjectURL(url);
         }
-      }, 'image/png'); // PNG không nén cho chất lượng cao nhất
+      }, "image/png"); // PNG không nén cho chất lượng cao nhất
     };
   };
 
@@ -84,15 +80,15 @@ export const Finish: React.FC = () => {
       try {
         const response = await fetch(finalImage);
         const blob = await response.blob();
-        const file = new File([blob], 'photobooth.jpg', { type: 'image/jpeg' });
-        
+        const file = new File([blob], "photobooth.jpg", { type: "image/jpeg" });
+
         await navigator.share({
           files: [file],
-          title: 'My PhotoBooth Picture',
-          text: 'Check out my awesome PhotoBooth picture!',
+          title: "My PhotoBooth Picture",
+          text: "Check out my awesome PhotoBooth picture!",
         });
       } catch (error) {
-        console.error('Error sharing:', error);
+        console.error("Error sharing:", error);
         // Fallback to copy URL
         if (navigator.clipboard) {
           navigator.clipboard.writeText(window.location.href);
@@ -102,43 +98,47 @@ export const Finish: React.FC = () => {
       // Fallback for browsers without Web Share API
       if (navigator.clipboard) {
         navigator.clipboard.writeText(window.location.href);
-        alert(language === 'vi' ? 'Link đã được sao chép!' : 'Link copied to clipboard!');
+        alert(
+          language === "vi"
+            ? "Link đã được sao chép!"
+            : "Link copied to clipboard!",
+        );
       }
     }
   };
 
   const handleNewSession = () => {
     resetSession();
-    navigate('/');
+    navigate("/");
   };
 
   const handlePrint = () => {
     if (!finalImage) return;
-    
+
     // Tạo canvas chất lượng cao cho in
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     const img = new Image();
     img.onload = () => {
       // Độ phân giải 300 DPI cho in (tương đương)
       const printScale = 4; // 4x cho chất lượng in cao
       canvas.width = img.naturalWidth * printScale;
       canvas.height = img.naturalHeight * printScale;
-      
+
       // Cài đặt chất lượng cao nhất cho in
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingQuality = "high";
       ctx.scale(printScale, printScale);
-      
+
       // Vẽ ảnh chất lượng cao
       ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-      
+
       // Tạo data URL chất lượng cao cho in
-      const highQualityDataUrl = canvas.toDataURL('image/png', 1.0);
-      
-      const printWindow = window.open('', '_blank');
+      const highQualityDataUrl = canvas.toDataURL("image/png", 1.0);
+
+      const printWindow = window.open("", "_blank");
       if (printWindow) {
         printWindow.document.write(`
           <!DOCTYPE html>
@@ -190,7 +190,7 @@ export const Finish: React.FC = () => {
   };
 
   if (!finalImage) {
-    navigate('/');
+    navigate("/");
     return null;
   }
 
@@ -230,26 +230,26 @@ export const Finish: React.FC = () => {
                   />
                 </svg>
               </motion.div>
-              
+
               {/* Sparkle effects */}
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
                   initial={{ scale: 0, rotate: 0 }}
-                  animate={{ 
+                  animate={{
                     scale: [0, 1, 0],
-                    rotate: [0, 180, 360]
+                    rotate: [0, 180, 360],
                   }}
-                  transition={{ 
+                  transition={{
                     delay: 0.8 + i * 0.1,
                     duration: 1.5,
                     repeat: Infinity,
-                    repeatDelay: 2
+                    repeatDelay: 2,
                   }}
                   className="absolute w-4 h-4 bg-yellow-400 rounded-full"
                   style={{
-                    top: `${20 + Math.cos(i * 60 * Math.PI / 180) * 60}px`,
-                    left: `${20 + Math.sin(i * 60 * Math.PI / 180) * 60}px`,
+                    top: `${20 + Math.cos((i * 60 * Math.PI) / 180) * 60}px`,
+                    left: `${20 + Math.sin((i * 60 * Math.PI) / 180) * 60}px`,
                   }}
                 />
               ))}
@@ -334,24 +334,28 @@ export const Finish: React.FC = () => {
                   <div className="flex items-center gap-3 mb-4">
                     <QrCode className="w-6 h-6 text-primary" />
                     <h3 className="font-semibold text-dark">
-                      {language === 'vi' ? 'Truy cập kỹ thuật số' : 'Digital Access'}
+                      {language === "vi"
+                        ? "Truy cập kỹ thuật số"
+                        : "Digital Access"}
                     </h3>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <img src={shareQR} alt="Share QR Code" className="w-24 h-24" />
+                    <img
+                      src={shareQR}
+                      alt="Share QR Code"
+                      className="w-24 h-24"
+                    />
                     <div className="text-center sm:text-left">
                       <p className="text-gray-600 text-sm mb-2">
-                        {language === 'vi' 
-                          ? 'Quét mã QR để tải ảnh về điện thoại'
-                          : 'Scan QR code to download to your phone'
-                        }
+                        {language === "vi"
+                          ? "Quét mã QR để tải ảnh về điện thoại"
+                          : "Scan QR code to download to your phone"}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {language === 'vi' 
-                          ? 'Ảnh có thể truy cập trong 7 ngày'
-                          : 'Photos available for 7 days'
-                        }
+                        {language === "vi"
+                          ? "Ảnh có thể truy cập trong 7 ngày"
+                          : "Photos available for 7 days"}
                       </p>
                     </div>
                   </div>
@@ -382,16 +386,14 @@ export const Finish: React.FC = () => {
                 className="text-center p-4 bg-primary/5 rounded-lg"
               >
                 <p className="text-primary font-medium">
-                  {language === 'vi' 
-                    ? '🎉 Cảm ơn bạn đã sử dụng PhotoBooth! 🎉'
-                    : '🎉 Thank you for using PhotoBooth! 🎉'
-                  }
+                  {language === "vi"
+                    ? "🎉 Cảm ơn bạn đã sử dụng PhotoBooth! 🎉"
+                    : "🎉 Thank you for using PhotoBooth! 🎉"}
                 </p>
                 <p className="text-gray-600 text-sm mt-1">
-                  {language === 'vi' 
-                    ? 'Hãy chia sẻ những khoảnh khắc đẹp!'
-                    : 'Share your beautiful moments!'
-                  }
+                  {language === "vi"
+                    ? "Hãy chia sẻ những khoảnh khắc đẹp!"
+                    : "Share your beautiful moments!"}
                 </p>
               </motion.div>
             </motion.div>

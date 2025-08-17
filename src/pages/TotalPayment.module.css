@@ -53,24 +53,24 @@
   align-items: center;
 }
 .colTitle {
-    font-size: 1em;
-    font-weight: 700;
-    font-style: normal;
-    color: rgb(36, 68, 139);
-    font-kerning: none;
-    text-decoration-line: none;
-    text-decoration-thickness: initial;
-    text-decoration-style: initial;
+  font-size: 1em;
+  font-weight: 700;
+  font-style: normal;
+  color: rgb(36, 68, 139);
+  font-kerning: none;
+  text-decoration-line: none;
+  text-decoration-thickness: initial;
+  text-decoration-style: initial;
 }
 .colTitle2 {
-    font-size: 1em;
-    font-weight: 700;
-    font-style: normal;
-    color: rgb(6, 7, 7);
-    font-kerning: none;
-    text-decoration-line: none;
-    text-decoration-thickness: initial;
-    text-decoration-style: initial;
+  font-size: 1em;
+  font-weight: 700;
+  font-style: normal;
+  color: rgb(6, 7, 7);
+  font-kerning: none;
+  text-decoration-line: none;
+  text-decoration-thickness: initial;
+  text-decoration-style: initial;
 }
 .colSub {
   height: 12px;
@@ -91,7 +91,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 18px;
-  box-shadow: 0 16px 36px rgba(0,22,122,0.08);
+  box-shadow: 0 16px 36px rgba(0, 22, 122, 0.08);
   background: #fff;
 }
 .hint {
@@ -107,7 +107,7 @@
   background: var(--primary);
   border-radius: 999px;
   margin-top: 6px;
-  box-shadow: 0 8px 16px rgba(0,22,122,0.12);
+  box-shadow: 0 8px 16px rgba(0, 22, 122, 0.12);
 }
 
 /* amount block on right */
@@ -132,20 +132,41 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(2,6,23,0.14);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.14);
   border: none;
   z-index: 60;
 }
 
 /* flush to the very left / right of the viewport with small inset */
-.navButtonLeft { left: 12px; }
-.navButtonRight { right: 12px; }
+.navButtonLeft {
+  left: 12px;
+}
+.navButtonRight {
+  right: 12px;
+}
 
 /* responsive: on small screens move buttons into top corners */
 @media (max-width: 900px) {
-  .main { flex-direction: column; gap: 18px; }
-  .col, .colCenter { width: 100%; }
-  .iconWrap { width: 160px; height: 180px; }
-  .navButtonLeft { left: 8px; top: 12px; transform: none; }
-  .navButtonRight { right: 8px; top: 12px; transform: none; }
+  .main {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .col,
+  .colCenter {
+    width: 100%;
+  }
+  .iconWrap {
+    width: 160px;
+    height: 180px;
+  }
+  .navButtonLeft {
+    left: 8px;
+    top: 12px;
+    transform: none;
+  }
+  .navButtonRight {
+    right: 8px;
+    top: 12px;
+    transform: none;
+  }
 }

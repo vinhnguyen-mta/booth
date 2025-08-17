@@ -1,25 +1,25 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { PaymentGuard } from './components/PaymentGuard';
-import { Landing } from './pages/Landing';
-import { ChooseFrame } from './pages/ChooseFrame';
-import { ChooseQuantity } from './pages/ChooseQuantity';
-import { Payment } from './pages/Payment';
-import { Capture } from './pages/Capture';
-import { Filters } from './pages/Filters';
-import { Preview } from './pages/Preview';
-import { Password } from './pages/Password';
-import {QRDownload} from './pages/QRDownload';
-import {ExportImage} from './pages/ExportImage';
-import {FilterImage} from './pages/FilterImage';
-import {ListImage} from './pages/ListImage';
-import {WaitCapture} from './pages/WaitCapture';
-import {End} from './pages/End';
-import { Print } from './pages/Print';
-import { Finish } from './pages/Finish';
-import TotalPayment from './pages/TotalPayment';
-import LoadingScreen from './pages/LoadingScreen';
-import { Startup } from './pages/Startup';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { PaymentGuard } from "./components/PaymentGuard";
+import { Landing } from "./pages/Landing";
+import { ChooseFrame } from "./pages/ChooseFrame";
+import { ChooseQuantity } from "./pages/ChooseQuantity";
+import { Payment } from "./pages/Payment";
+import { Capture } from "./pages/Capture";
+import { Filters } from "./pages/Filters";
+import { Preview } from "./pages/Preview";
+import { Password } from "./pages/Password";
+import { QRDownload } from "./pages/QRDownload";
+import { ExportImage } from "./pages/ExportImage";
+import { FilterImage } from "./pages/FilterImage";
+import { ListImage } from "./pages/ListImage";
+import { WaitCapture } from "./pages/WaitCapture";
+import { End } from "./pages/End";
+import { Print } from "./pages/Print";
+import { Finish } from "./pages/Finish";
+import TotalPayment from "./pages/TotalPayment";
+import LoadingScreen from "./pages/LoadingScreen";
+import { Startup } from "./pages/Startup";
 
 function App() {
   return (
@@ -32,7 +32,14 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/total-payment" element={<TotalPayment />} />
         <Route path="/loading" element={<LoadingScreen />} />
-        <Route path="/capture" element={<PaymentGuard><Capture /></PaymentGuard>} />
+        <Route
+          path="/capture"
+          element={
+            <PaymentGuard>
+              <Capture />
+            </PaymentGuard>
+          }
+        />
         <Route path="/filters" element={<Filters />} />
         <Route path="/preview" element={<Preview />} />
         <Route path="/finish" element={<Finish />} />

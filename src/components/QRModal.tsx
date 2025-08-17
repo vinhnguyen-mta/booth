@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock } from 'lucide-react';
-import QRCode from 'qrcode';
-import styles from './QRModal.module.css';
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Clock } from "lucide-react";
+import QRCode from "qrcode";
+import styles from "./QRModal.module.css";
 
 interface QRModalProps {
   isOpen: boolean;
@@ -12,16 +12,16 @@ interface QRModalProps {
     paymentId: string;
     expiresAt: string;
   };
-  language: 'en' | 'vi';
+  language: "en" | "vi";
 }
 
 export const QRModal: React.FC<QRModalProps> = ({
   isOpen,
   onClose,
   paymentData,
-  language
+  language,
 }) => {
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   useEffect(() => {
@@ -44,13 +44,13 @@ export const QRModal: React.FC<QRModalProps> = ({
         width: 512,
         margin: 2,
         color: {
-          dark: '#00167a',
-          light: '#ffffff'
-        }
+          dark: "#00167a",
+          light: "#ffffff",
+        },
       });
       setQrDataUrl(dataUrl);
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      console.error("Error generating QR code:", error);
     }
   };
 
@@ -70,11 +70,11 @@ export const QRModal: React.FC<QRModalProps> = ({
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat('vi-VN').format(price);
+    new Intl.NumberFormat("vi-VN").format(price);
 
   return (
     <AnimatePresence>
@@ -93,32 +93,38 @@ export const QRModal: React.FC<QRModalProps> = ({
             className={styles.modal}
             onClick={(e) => e.stopPropagation()}
           >
-            <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+            <button
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Close"
+            >
               <X className={styles.closeIcon} />
             </button>
 
             <header className={styles.header}>
               <h4 className={styles.title}>
-                {language === 'vi'
-                  ? 'VUI LÒNG QUÉT MÃ THANH TOÁN DƯỚI ĐÂY BẰNG ỨNG DỤNG NGÂN HÀNG HOẶC VÍ ĐIỆN TỬ CỦA BẠN'
-                  : 'PLEASE SCAN QR-CODE FOR PAYMENT'}
+                {language === "vi"
+                  ? "VUI LÒNG QUÉT MÃ THANH TOÁN DƯỚI ĐÂY BẰNG ỨNG DỤNG NGÂN HÀNG HOẶC VÍ ĐIỆN TỬ CỦA BẠN"
+                  : "PLEASE SCAN QR-CODE FOR PAYMENT"}
               </h4>
 
               <p>
-                PLEASE SCAN QR-CODE WITH YOUR MOBILE BANKING OR E-WALLET APPLICATION
+                PLEASE SCAN QR-CODE WITH YOUR MOBILE BANKING OR E-WALLET
+                APPLICATION
               </p>
-
             </header>
 
             <div className={styles.center}>
               <div className={styles.qrWrap}>
-                <div className={styles.scanPill}>
-                  SCAN ME
-                </div>
+                <div className={styles.scanPill}>SCAN ME</div>
 
                 <div className={styles.qrBox}>
                   {qrDataUrl ? (
-                    <img src={qrDataUrl} alt="QR Code" className={styles.qrImage} />
+                    <img
+                      src={qrDataUrl}
+                      alt="QR Code"
+                      className={styles.qrImage}
+                    />
                   ) : (
                     <div className={styles.qrPlaceholder} />
                   )}
@@ -128,7 +134,8 @@ export const QRModal: React.FC<QRModalProps> = ({
               <div className={styles.timer}>
                 <Clock className={styles.timerIcon} />
                 <span className={styles.timerText}>
-                  {language === 'vi' ? 'Thời gian còn lại:' : 'Time remaining:'} {formatTime(timeLeft)}
+                  {language === "vi" ? "Thời gian còn lại:" : "Time remaining:"}{" "}
+                  {formatTime(timeLeft)}
                 </span>
               </div>
             </div>

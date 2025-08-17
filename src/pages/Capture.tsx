@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { useAppStore } from '../store/useAppStore';
-import styles from './Capture.module.css';
-import { Camera, RefreshCw, Pause, ArrowRight } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Layout } from "../components/Layout";
+import { useAppStore } from "../store/useAppStore";
+import styles from "./Capture.module.css";
+import { Camera, RefreshCw, Pause, ArrowRight } from "lucide-react";
 
 export const Capture: React.FC = () => {
   const navigate = useNavigate();
@@ -16,12 +16,12 @@ export const Capture: React.FC = () => {
     addCapturedVideo,
     clearCapturedImages,
     clearCapturedVideos,
-    setCurrentStep
+    setCurrentStep,
   } = useAppStore();
 
   const t = {
-    title: language === 'vi' ? 'Chụp ảnh' : 'Capture',
-    hint: language === 'vi' ? 'Vui lòng tạo dáng' : 'Please pose'
+    title: language === "vi" ? "Chụp ảnh" : "Capture",
+    hint: language === "vi" ? "Vui lòng tạo dáng" : "Please pose",
   };
 
   const [requiredPhotos] = useState<number>(8);
@@ -34,7 +34,8 @@ export const Capture: React.FC = () => {
   const [capturedVideos, setCapturedVideos] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
 
-  const [capturedImages, setCapturedImages] = useState<string[]>(storeCapturedImages);
+  const [capturedImages, setCapturedImages] =
+    useState<string[]>(storeCapturedImages);
   const [gifs, setGifs] = useState<string[]>([]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -56,7 +57,10 @@ export const Capture: React.FC = () => {
     let mounted = true;
     const start = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false,
+        });
         if (!mounted) {
           stream.getTracks().forEach((t) => t.stop());
           return;
@@ -65,21 +69,23 @@ export const Capture: React.FC = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           // try to play; some browsers require user gesture but we attempt
-          try { await videoRef.current.play(); } catch {}
+          try {
+            await videoRef.current.play();
+          } catch {}
         }
       } catch (err) {
-        console.error('Camera start error', err);
+        console.error("Camera start error", err);
       }
     };
     start();
 
     // prevent page scroll while on capture
     const prevOverflow = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.overflow = "hidden";
 
     return () => {
       mounted = false;
-      document.documentElement.style.overflow = prevOverflow || '';
+      document.documentElement.style.overflow = prevOverflow || "";
       stopStream();
       stopContinuous();
       // clear any pending timeouts
@@ -94,7 +100,7 @@ export const Capture: React.FC = () => {
 
     try {
       const mediaRecorder = new MediaRecorder(streamRef.current, {
-        mimeType: 'video/webm;codecs=vp9' // Try VP9 first
+        mimeType: "video/webm;codecs=vp9", // Try VP9 first
       });
 
       mediaRecorder.ondataavailable = (event) => {
@@ -104,10 +110,12 @@ export const Capture: React.FC = () => {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        const blob = new Blob(recordedChunksRef.current, {
+          type: "video/webm",
+        });
         const videoUrl = URL.createObjectURL(blob);
-        
-        setCapturedVideos(prev => [...prev, videoUrl]);
+
+        setCapturedVideos((prev) => [...prev, videoUrl]);
         recordedChunksRef.current = [];
       };
 
@@ -116,7 +124,7 @@ export const Capture: React.FC = () => {
       // Fallback to VP8 if VP9 not supported
       try {
         const mediaRecorder = new MediaRecorder(streamRef.current, {
-          mimeType: 'video/webm;codecs=vp8'
+          mimeType: "video/webm;codecs=vp8",
         });
 
         mediaRecorder.ondataavailable = (event) => {
@@ -126,16 +134,18 @@ export const Capture: React.FC = () => {
         };
 
         mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+          const blob = new Blob(recordedChunksRef.current, {
+            type: "video/webm",
+          });
           const videoUrl = URL.createObjectURL(blob);
-          
-          setCapturedVideos(prev => [...prev, videoUrl]);
+
+          setCapturedVideos((prev) => [...prev, videoUrl]);
           recordedChunksRef.current = [];
         };
 
         return mediaRecorder;
       } catch (fallbackError) {
-        console.error('MediaRecorder not supported:', fallbackError);
+        console.error("MediaRecorder not supported:", fallbackError);
         return null;
       }
     }
@@ -147,33 +157,36 @@ export const Capture: React.FC = () => {
 
     const mediaRecorder = setupMediaRecorder();
     if (!mediaRecorder) {
-      console.warn('Video recording not supported');
+      console.warn("Video recording not supported");
       return;
     }
 
     mediaRecorderRef.current = mediaRecorder;
     recordedChunksRef.current = [];
-    
+
     try {
       mediaRecorder.start();
       setIsRecording(true);
-      
+
       // Stop recording after 2.5 seconds
       setTimeout(() => {
-        if (mediaRecorder.state === 'recording') {
+        if (mediaRecorder.state === "recording") {
           mediaRecorder.stop();
           setIsRecording(false);
         }
       }, 2500);
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.error("Failed to start recording:", error);
       setIsRecording(false);
     }
   }, [isRecording, setupMediaRecorder]);
 
   // Stop video recording
   const stopVideoRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === "recording"
+    ) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
@@ -185,7 +198,9 @@ export const Capture: React.FC = () => {
       streamRef.current = null;
     }
     if (videoRef.current) {
-      try { videoRef.current.pause(); } catch {}
+      try {
+        videoRef.current.pause();
+      } catch {}
       // @ts-ignore
       videoRef.current.srcObject = null;
     }
@@ -196,13 +211,15 @@ export const Capture: React.FC = () => {
     if (video.videoWidth > 0 && video.videoHeight > 0) return;
     return new Promise<void>((resolve) => {
       const onMeta = () => {
-        video.removeEventListener('loadedmetadata', onMeta);
+        video.removeEventListener("loadedmetadata", onMeta);
         resolve();
       };
-      video.addEventListener('loadedmetadata', onMeta);
+      video.addEventListener("loadedmetadata", onMeta);
       // fallback
       setTimeout(() => {
-        try { video.removeEventListener('loadedmetadata', onMeta); } catch {}
+        try {
+          video.removeEventListener("loadedmetadata", onMeta);
+        } catch {}
         resolve();
       }, 500);
     });
@@ -212,7 +229,7 @@ export const Capture: React.FC = () => {
   const captureShot = useCallback(async () => {
     // Prevent multiple captures at the same time
     if (isCapturingPhoto) return null;
-    
+
     const video = videoRef.current;
     if (!video) return null;
 
@@ -227,25 +244,27 @@ export const Capture: React.FC = () => {
     try {
       await ensureVideoReady(video);
 
-      const canvas = canvasRef.current || document.createElement('canvas');
+      const canvas = canvasRef.current || document.createElement("canvas");
       const w = video.videoWidth || 1280;
       const h = video.videoHeight || 720;
       canvas.width = w;
       canvas.height = h;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) return null;
 
       // apply smoothing filter on canvas capture if enabled
       try {
-        ctx.filter = smoothFilter ? 'blur(0.6px) saturate(1.05) contrast(1.02)' : 'none';
+        ctx.filter = smoothFilter
+          ? "blur(0.6px) saturate(1.05) contrast(1.02)"
+          : "none";
         ctx.drawImage(video, 0, 0, w, h);
-        ctx.filter = 'none';
+        ctx.filter = "none";
       } catch (err) {
-        console.error('drawImage failed', err);
+        console.error("drawImage failed", err);
         return null;
       }
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
 
       // Update local state first
       setCapturedImages((prev) => {
@@ -255,15 +274,15 @@ export const Capture: React.FC = () => {
       });
 
       // Then update store
-      try { 
-        addCapturedImage && addCapturedImage(dataUrl); 
+      try {
+        addCapturedImage && addCapturedImage(dataUrl);
       } catch (err) {
-        console.error('Failed to add image to store:', err);
+        console.error("Failed to add image to store:", err);
       }
 
       return dataUrl;
     } catch (err) {
-      console.error('Capture shot failed:', err);
+      console.error("Capture shot failed:", err);
       return null;
     } finally {
       // Reset capture flag after a short delay to prevent rapid successive captures
@@ -271,7 +290,15 @@ export const Capture: React.FC = () => {
         setIsCapturingPhoto(false);
       }, 200);
     }
-  }, [addCapturedImage, ensureVideoReady, requiredPhotos, smoothFilter, capturedImages.length, isCapturingPhoto, startVideoRecording]);
+  }, [
+    addCapturedImage,
+    ensureVideoReady,
+    requiredPhotos,
+    smoothFilter,
+    capturedImages.length,
+    isCapturingPhoto,
+    startVideoRecording,
+  ]);
 
   const handleSingleCapture = async () => {
     if (capturedImages.length >= requiredPhotos || isCapturingPhoto) return;
@@ -288,17 +315,25 @@ export const Capture: React.FC = () => {
     timeoutsRef.current = [];
 
     setCycleCountdown(3);
-    timeoutsRef.current.push(window.setTimeout(() => setCycleCountdown(2), 1000));
-    timeoutsRef.current.push(window.setTimeout(() => setCycleCountdown(1), 2000));
-    timeoutsRef.current.push(window.setTimeout(async () => {
-      setCycleCountdown(0);
+    timeoutsRef.current.push(
+      window.setTimeout(() => setCycleCountdown(2), 1000),
+    );
+    timeoutsRef.current.push(
+      window.setTimeout(() => setCycleCountdown(1), 2000),
+    );
+    timeoutsRef.current.push(
+      window.setTimeout(async () => {
+        setCycleCountdown(0);
 
-      // capture one photo (up to limit) - await to ensure completion
-      await captureShot();
+        // capture one photo (up to limit) - await to ensure completion
+        await captureShot();
 
-      // small 0.7s pause
-      timeoutsRef.current.push(window.setTimeout(() => setCycleCountdown(0), 700));
-    }, 3000));
+        // small 0.7s pause
+        timeoutsRef.current.push(
+          window.setTimeout(() => setCycleCountdown(0), 700),
+        );
+      }, 3000),
+    );
   }, [captureShot, isCapturingPhoto, capturedImages.length, requiredPhotos]);
 
   const startContinuous = () => {
@@ -315,7 +350,7 @@ export const Capture: React.FC = () => {
     }
     cycleIntervalRef.current = window.setInterval(() => {
       // stop if reached max (check current state)
-      setCapturedImages(current => {
+      setCapturedImages((current) => {
         if (current.length >= requiredPhotos) {
           stopContinuous();
           return current;
@@ -361,15 +396,19 @@ export const Capture: React.FC = () => {
     if (capturedImages.length >= requiredPhotos && isContinuous) {
       stopContinuous();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [capturedImages.length]);
 
   const handleReset = () => {
     stopContinuous();
     setCapturedImages([]);
     setCapturedVideos([]);
-    try { clearCapturedImages && clearCapturedImages(); } catch {}
-    try { clearCapturedVideos && clearCapturedVideos(); } catch {}
+    try {
+      clearCapturedImages && clearCapturedImages();
+    } catch {}
+    try {
+      clearCapturedVideos && clearCapturedVideos();
+    } catch {}
   };
 
   const handleNext = () => {
@@ -377,103 +416,114 @@ export const Capture: React.FC = () => {
     for (const video of capturedVideos) {
       addCapturedVideo(video);
     }
-    navigate('/preview');
+    navigate("/preview");
   };
 
   // Convert video to GIF using canvas frames
   const convertVideoToGif = useCallback(async (videoUrl: string) => {
     return new Promise<string>((resolve, reject) => {
-      const video = document.createElement('video');
+      const video = document.createElement("video");
       video.src = videoUrl;
       video.muted = true;
-      video.crossOrigin = 'anonymous';
-      
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
+      video.crossOrigin = "anonymous";
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
       if (!ctx) {
-        reject(new Error('Canvas context not available'));
+        reject(new Error("Canvas context not available"));
         return;
       }
 
       video.onloadedmetadata = () => {
         canvas.width = Math.min(video.videoWidth, 400); // Limit size for GIF
         canvas.height = Math.min(video.videoHeight, 300);
-        
+
         const frames: ImageData[] = [];
         let currentTime = 0;
         const frameRate = 10; // 10 FPS for GIF
         const frameDuration = 1 / frameRate;
-        
+
         const captureFrame = () => {
           if (currentTime >= video.duration) {
             // Create simple GIF-like data URL (simplified)
             // In real implementation, you'd use a GIF encoding library
-            const gifDataUrl = createSimpleGif(frames, canvas.width, canvas.height);
+            const gifDataUrl = createSimpleGif(
+              frames,
+              canvas.width,
+              canvas.height,
+            );
             resolve(gifDataUrl);
             return;
           }
-          
+
           video.currentTime = currentTime;
         };
-        
+
         video.onseeked = () => {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           frames.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
           currentTime += frameDuration;
           captureFrame();
         };
-        
+
         captureFrame();
       };
-      
-      video.onerror = () => reject(new Error('Video load failed'));
+
+      video.onerror = () => reject(new Error("Video load failed"));
     });
   }, []);
 
   // Simplified GIF creation (for demo - in production use proper GIF encoder)
-  const createSimpleGif = (frames: ImageData[], width: number, height: number) => {
+  const createSimpleGif = (
+    frames: ImageData[],
+    width: number,
+    height: number,
+  ) => {
     // This is a simplified version - for real GIF creation, use libraries like gif.js
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    
+    const ctx = canvas.getContext("2d");
+
     if (ctx && frames.length > 0) {
       // Use middle frame as static representation
       ctx.putImageData(frames[Math.floor(frames.length / 2)], 0, 0);
-      return canvas.toDataURL('image/png');
+      return canvas.toDataURL("image/png");
     }
-    
-    return '';
+
+    return "";
   };
 
   // Download video as WebM or convert to GIF
-  const downloadVideo = useCallback(async (videoUrl: string, index: number, asGif: boolean = false) => {
-    try {
-      if (asGif) {
-        const gifUrl = await convertVideoToGif(videoUrl);
-        const link = document.createElement('a');
-        link.href = gifUrl;
-        link.download = `capture_${index + 1}.png`; // Simplified as PNG
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        const response = await fetch(videoUrl);
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `capture_${index + 1}.webm`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
+  const downloadVideo = useCallback(
+    async (videoUrl: string, index: number, asGif: boolean = false) => {
+      try {
+        if (asGif) {
+          const gifUrl = await convertVideoToGif(videoUrl);
+          const link = document.createElement("a");
+          link.href = gifUrl;
+          link.download = `capture_${index + 1}.png`; // Simplified as PNG
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          const response = await fetch(videoUrl);
+          const blob = await response.blob();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `capture_${index + 1}.webm`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+        }
+      } catch (error) {
+        console.error("Download failed:", error);
       }
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
-  }, [convertVideoToGif]);
+    },
+    [convertVideoToGif],
+  );
 
   // ----------------- JSX layout updated: smaller frameArea + gifs sidebar -----------------
   return (
@@ -484,19 +534,26 @@ export const Capture: React.FC = () => {
         </header>
 
         <main className={styles.main}>
-          <div className={styles.previewWrap} style={{ position: 'relative' }}>
+          <div className={styles.previewWrap} style={{ position: "relative" }}>
             {/* container: frame on left (smaller), gif/video list on the right (scrollable, max 8) */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, width: '100%' }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 16,
+                width: "100%",
+              }}
+            >
               {/* Frame area - reduced size */}
               <div
                 className={styles.frameArea}
                 style={{
                   width: 390, // reduced width
                   height: 300,
-                  maxWidth: '65vw',
-                  maxHeight: '75vh',
-                  position: 'relative',
-                  boxSizing: 'border-box'
+                  maxWidth: "65vw",
+                  maxHeight: "75vh",
+                  position: "relative",
+                  boxSizing: "border-box",
                 }}
               >
                 <video
@@ -504,9 +561,16 @@ export const Capture: React.FC = () => {
                   className={styles.video}
                   playsInline
                   muted
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                 />
-                {selectedFrame && <div className={styles.frameOverlay} aria-hidden />}
+                {selectedFrame && (
+                  <div className={styles.frameOverlay} aria-hidden />
+                )}
                 {cycleCountdown > 0 && (
                   <div className={styles.overlayCountdown}>
                     <div className={styles.overlayNumber}>{cycleCountdown}</div>
@@ -520,111 +584,253 @@ export const Capture: React.FC = () => {
                 style={{
                   width: 160,
                   maxHeight: 280, // align with frameArea height
-                  overflowY: 'auto',
+                  overflowY: "auto",
                   padding: 8,
-                  background: 'rgba(255,255,255,0.98)',
+                  background: "rgba(255,255,255,0.98)",
                   borderRadius: 8,
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.06)',
-                  flexShrink: 0
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+                  flexShrink: 0,
                 }}
               >
-                <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, textAlign: 'center' }}>
-                  {language === 'vi' ? 'GIF/Video' : 'GIFs / Video'}
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "#374151",
+                    marginBottom: 8,
+                    textAlign: "center",
+                  }}
+                >
+                  {language === "vi" ? "GIF/Video" : "GIFs / Video"}
                 </div>
 
                 {capturedVideos.length === 0 && gifs.length === 0 && (
-                  <div style={{ color: '#6b7280', fontSize: 12, textAlign: 'center', padding: '12px 4px' }}>
-                    {language === 'vi' ? 'Chưa có clip' : 'No clips yet'}
+                  <div
+                    style={{
+                      color: "#6b7280",
+                      fontSize: 12,
+                      textAlign: "center",
+                      padding: "12px 4px",
+                    }}
+                  >
+                    {language === "vi" ? "Chưa có clip" : "No clips yet"}
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                >
                   {/* show generated gifs first (if any), then small video previews; limit total to 8 */}
-                  {gifs.slice(0, 8).map((gif, idx) => (
+                  {gifs.slice(0, 8).map((gif, idx) =>
                     gif ? (
-                      <div key={`gif-${idx}`} style={{ width: '100%', height: 80, borderRadius: 6, overflow: 'hidden', position: 'relative', border: '1px solid #e5e7eb' }}>
-                        <img src={gif} alt={`gif-${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                        <div style={{ position: 'absolute', right: 6, bottom: 6, display: 'flex', gap: 6 }}>
+                      <div
+                        key={`gif-${idx}`}
+                        style={{
+                          width: "100%",
+                          height: 80,
+                          borderRadius: 6,
+                          overflow: "hidden",
+                          position: "relative",
+                          border: "1px solid #e5e7eb",
+                        }}
+                      >
+                        <img
+                          src={gif}
+                          alt={`gif-${idx}`}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: 6,
+                            bottom: 6,
+                            display: "flex",
+                            gap: 6,
+                          }}
+                        >
                           <button
-                            onClick={() => downloadVideo(capturedVideos[idx] || '', idx, false)}
+                            onClick={() =>
+                              downloadVideo(
+                                capturedVideos[idx] || "",
+                                idx,
+                                false,
+                              )
+                            }
                             title="Download WebM"
-                            style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', padding: '4px 6px', borderRadius: 4, fontSize: 10, cursor: 'pointer' }}
+                            style={{
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              border: "none",
+                              padding: "4px 6px",
+                              borderRadius: 4,
+                              fontSize: 10,
+                              cursor: "pointer",
+                            }}
                           >
                             WebM
                           </button>
                           <button
-                            onClick={() => downloadVideo(capturedVideos[idx] || '', idx, true)}
+                            onClick={() =>
+                              downloadVideo(
+                                capturedVideos[idx] || "",
+                                idx,
+                                true,
+                              )
+                            }
                             title="Download GIF"
-                            style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', padding: '4px 6px', borderRadius: 4, fontSize: 10, cursor: 'pointer' }}
+                            style={{
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              border: "none",
+                              padding: "4px 6px",
+                              borderRadius: 4,
+                              fontSize: 10,
+                              cursor: "pointer",
+                            }}
                           >
                             GIF
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div key={`gif-${idx}`} style={{ width: '100%', height: 80, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>
-                        {language === 'vi' ? 'Đang xử lý...' : 'Processing...'}
+                      <div
+                        key={`gif-${idx}`}
+                        style={{
+                          width: "100%",
+                          height: 80,
+                          borderRadius: 6,
+                          background: "#f3f4f6",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#9ca3af",
+                        }}
+                      >
+                        {language === "vi" ? "Đang xử lý..." : "Processing..."}
                       </div>
-                    )
-                  ))}
+                    ),
+                  )}
 
                   {/* video thumbnails (fill up to total 8 items including gifs) */}
-                  {capturedVideos.slice(0, 8 - gifs.length).map((videoUrl, idx) => (
-                    <div key={`v-${idx}`} style={{ width: '100%', height: 80, borderRadius: 6, overflow: 'hidden', position: 'relative', border: '1px solid #e5e7eb' }}>
-                      <video
-                        src={videoUrl}
-                        muted
-                        loop
-                        autoPlay
-                        playsInline
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
-                      <div style={{ position: 'absolute', right: 6, bottom: 6, display: 'flex', gap: 6 }}>
-                        <button
-                          onClick={() => downloadVideo(videoUrl, idx, false)}
-                          title="Download WebM"
-                          style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', padding: '4px 6px', borderRadius: 4, fontSize: 10, cursor: 'pointer' }}
+                  {capturedVideos
+                    .slice(0, 8 - gifs.length)
+                    .map((videoUrl, idx) => (
+                      <div
+                        key={`v-${idx}`}
+                        style={{
+                          width: "100%",
+                          height: 80,
+                          borderRadius: 6,
+                          overflow: "hidden",
+                          position: "relative",
+                          border: "1px solid #e5e7eb",
+                        }}
+                      >
+                        <video
+                          src={videoUrl}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: 6,
+                            bottom: 6,
+                            display: "flex",
+                            gap: 6,
+                          }}
                         >
-                          WebM
-                        </button>
-                        <button
-                          onClick={() => downloadVideo(videoUrl, idx, true)}
-                          title="Download GIF"
-                          style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', padding: '4px 6px', borderRadius: 4, fontSize: 10, cursor: 'pointer' }}
-                        >
-                          GIF
-                        </button>
+                          <button
+                            onClick={() => downloadVideo(videoUrl, idx, false)}
+                            title="Download WebM"
+                            style={{
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              border: "none",
+                              padding: "4px 6px",
+                              borderRadius: 4,
+                              fontSize: 10,
+                              cursor: "pointer",
+                            }}
+                          >
+                            WebM
+                          </button>
+                          <button
+                            onClick={() => downloadVideo(videoUrl, idx, true)}
+                            title="Download GIF"
+                            style={{
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              border: "none",
+                              padding: "4px 6px",
+                              borderRadius: 4,
+                              fontSize: 10,
+                              cursor: "pointer",
+                            }}
+                          >
+                            GIF
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </aside>
             </div>
 
             {/* action row and thumbs stay below frame+sidebar */}
             <div className={styles.actionRow} style={{ marginTop: 12 }}>
-              <button className={styles.iconBtn} onClick={handleReset} title={language === 'vi' ? 'Reset ảnh' : 'Reset'}>
+              <button
+                className={styles.iconBtn}
+                onClick={handleReset}
+                title={language === "vi" ? "Reset ảnh" : "Reset"}
+              >
                 <RefreshCw />
               </button>
 
-              <button 
-                className={styles.captureBtn} 
-                onClick={handleSingleCapture} 
-                disabled={isCapturingPhoto || capturedImages.length >= requiredPhotos}
-                title={language === 'vi' ? 'Chụp 1 ảnh' : 'Capture'}
+              <button
+                className={styles.captureBtn}
+                onClick={handleSingleCapture}
+                disabled={
+                  isCapturingPhoto || capturedImages.length >= requiredPhotos
+                }
+                title={language === "vi" ? "Chụp 1 ảnh" : "Capture"}
               >
                 <Camera />
               </button>
 
               <button
-                className={`${styles.iconBtn} ${isContinuous ? styles.active : ''}`}
-                onClick={() => (isContinuous ? stopContinuous() : startContinuous())}
+                className={`${styles.iconBtn} ${isContinuous ? styles.active : ""}`}
+                onClick={() =>
+                  isContinuous ? stopContinuous() : startContinuous()
+                }
                 disabled={capturedImages.length >= requiredPhotos}
-                title={language === 'vi' ? 'Chụp liên tiếp (1 ảnh sau 3s)' : 'Continuous (1 shot after 3s)'}
+                title={
+                  language === "vi"
+                    ? "Chụp liên tiếp (1 ảnh sau 3s)"
+                    : "Continuous (1 shot after 3s)"
+                }
                 aria-label="continuous-capture"
               >
                 {!isContinuous ? (
-                  <svg width="18" height="18" viewBox="0 0 32 32" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 32 32"
+                    fill="#fff"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <g transform="translate(-108,-196)">
                       <path d="m121.89453,202.00586c-0.92482,0-1.77586,0.52633-2.18945,1.35351l-0.32227,0.64649H117c-1.64501,0-3,1.35499-3,3v10c0,1.64501,1.35499,3,3,3h14c1.64501,0,3-1.35499,3-3v-10c0-1.64501-1.35499-3-3-3h-2.38281l-0.32227-0.64649c-0.41359-0.82718-1.26463-1.35351-2.18945-1.35351z" />
                       <path d="m124,208.00586c-2.19729,0-4,1.80271-4,4 0,2.19729 1.80271,4 4,4 2.19729,0 4-1.80271 4-4 0-2.19729-1.80271-4-4-4z" />
@@ -637,21 +843,41 @@ export const Capture: React.FC = () => {
 
               <div className={styles.counter}>
                 {capturedImages.length} / {requiredPhotos}
-                {isContinuous && <div style={{ fontSize: 12, marginTop: 4 }}>{countdown > 0 ? countdown : ''}</div>}
+                {isContinuous && (
+                  <div style={{ fontSize: 12, marginTop: 4 }}>
+                    {countdown > 0 ? countdown : ""}
+                  </div>
+                )}
               </div>
 
               <label className={styles.filterLabel}>
-                <input type="checkbox" checked={smoothFilter} onChange={(e) => setSmoothFilter(e.target.checked)} />
-                <span>{language === 'vi' ? 'Làm mịn da' : 'Smooth skin'}</span>
+                <input
+                  type="checkbox"
+                  checked={smoothFilter}
+                  onChange={(e) => setSmoothFilter(e.target.checked)}
+                />
+                <span>{language === "vi" ? "Làm mịn da" : "Smooth skin"}</span>
               </label>
             </div>
 
-            <div className={styles.thumbsWrap} aria-label="Captured images" style={{ marginTop: 12 }}>
+            <div
+              className={styles.thumbsWrap}
+              aria-label="Captured images"
+              style={{ marginTop: 12 }}
+            >
               <div className={styles.thumbs}>
-                {capturedImages.length === 0 && <div className={styles.emptyHint}>{language === 'vi' ? 'Chưa có ảnh' : 'No photos yet'}</div>}
+                {capturedImages.length === 0 && (
+                  <div className={styles.emptyHint}>
+                    {language === "vi" ? "Chưa có ảnh" : "No photos yet"}
+                  </div>
+                )}
                 {capturedImages.map((src: string, idx: number) => (
                   <div key={idx} className={styles.thumbItem}>
-                    <img src={src} alt={`capture-${idx}`} className={styles.thumbImg} />
+                    <img
+                      src={src}
+                      alt={`capture-${idx}`}
+                      className={styles.thumbImg}
+                    />
                   </div>
                 ))}
               </div>
@@ -662,15 +888,21 @@ export const Capture: React.FC = () => {
               <button
                 className={styles.nextBtn}
                 onClick={handleNext}
-                title={language === 'vi' ? 'Tiếp tục' : 'Next'}
-                style={{ position: 'fixed', right: 12, top: '50%', transform: 'translateY(-50%)', zIndex: 90 }}
+                title={language === "vi" ? "Tiếp tục" : "Next"}
+                style={{
+                  position: "fixed",
+                  right: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  zIndex: 90,
+                }}
               >
                 <ArrowRight size={20} />
               </button>
             )}
           </div>
 
-          <canvas ref={canvasRef} style={{ display: 'none' }} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
         </main>
       </div>
     </Layout>
