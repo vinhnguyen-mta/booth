@@ -1,22 +1,28 @@
 // UPDATE: New reusable FrameSelector component
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Frame, getFrames, formatPrice } from '../services/api';
+import styles from './FrameSelector.module.css';
 
 interface FrameSelectorProps {
   selectedFrame: Frame | null;
   onFrameSelect: (frame: Frame) => void;
+  onBack?: () => void;
+  onContinue?: () => void;
   language: 'en' | 'vi';
 }
 
 export const FrameSelector: React.FC<FrameSelectorProps> = ({
   selectedFrame,
   onFrameSelect,
+  onBack,
+  onContinue,
   language
 }) => {
   const [frames, setFrames] = useState<Frame[]>([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     loadFrames();
@@ -33,6 +39,13 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
     }
   };
 
+  const scroll = (dir: 'left' | 'right') => {
+    const el = containerRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.5, 200);
+    el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -42,60 +55,70 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
   }
 
   return (
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4 max-w-5xl mx-auto">
-        {frames.slice(0, 8).map((frame, index) => (
+    <div className={styles.wrapper}>
+      {/* <button
+        className={`${styles.navButton} ${styles.left}`}
+        aria-label="Previous"
+        onClick={() => {
+          if (onBack) onBack();
+          else scroll('left');
+        }}
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button> */}
+
+      <div className={styles.container} ref={containerRef}>
+        {frames.slice(0, 8).map((frame, index) => {
+          const isSelected = selectedFrame?.id === frame.id;
+          return (
             <motion.div
-                key={frame.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`relative bg-white rounded-2xl shadow-lg overflow-hidden border-3 transition-all duration-300 cursor-pointer hover:shadow-xl ${
-                    selectedFrame?.id === frame.id
-                        ? 'border-primary shadow-xl scale-102 ring-2 ring-primary/20'
-                        : 'border-transparent hover:border-primary/30 hover:scale-102'
-                }`}
-                onClick={() => onFrameSelect(frame)}
+              key={frame.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.06 }}
+              className={`${styles.item} ${isSelected ? styles.selected : ''}`}
+              onClick={() => onFrameSelect(frame)}
             >
-              {/* Frame Preview */}
-              <div className="aspect-[4/5] p-3 bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center relative overflow-hidden">
-                {/* Background pattern */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute inset-0" style={{
-                    backgroundImage: 'radial-gradient(circle at 2px 2px, #F34B52 1px, transparent 0)',
-                    backgroundSize: '20px 20px'
-                  }}></div>
-                </div>
-                <div
-                    className="w-full h-full max-w-20 max-h-56 relative z-10 flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: frame.svg }}
-                />
+              <div className={styles.titleBadge}>
+                <span>{language === 'vi' ? frame.name_vi : frame.name}</span>
               </div>
 
-              {/* Frame Info */}
-              <div className="p-3 bg-white border-t border-gray-100">
-                <h3 className="text-sm font-bold text-dark mb-1">
-                  {language === 'vi' ? frame.name_vi : frame.name}
-                </h3>
-                <p className="text-gray-600 text-xs mb-2">
-                  {frame.panels} {language === 'vi' ? 'ảnh' : 'photos'}
-                </p>
-                <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-primary">
-            {formatPrice(frame.price)}₫
-          </span>
-                  {selectedFrame?.id === frame.id && (
-                      <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-lg"
-                      >
-                        <Check className="w-3 h-3 text-white" />
-                      </motion.div>
-                  )}
-                </div>
+              <div className={styles.previewWrap}>
+                <div className={styles.frameStroke} dangerouslySetInnerHTML={{ __html: frame.svg }} />
               </div>
+
+              <div className={styles.footer}>
+                <div className={styles.panels}>
+                  {frame.panels} {language === 'vi' ? 'ảnh' : 'cut'}
+                </div>
+                <div className={styles.price}>{formatPrice(frame.price)}₫</div>
+              </div>
+
+              {isSelected && (
+                <>
+                  <div className={styles.checkBadge} aria-hidden>
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                </>
+              )}
             </motion.div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Right arrow: chỉ render khi có selection */}
+      {selectedFrame ? (
+        <button
+          className={`${styles.navButton} ${styles.right}`}
+          aria-label="Next"
+          onClick={() => {
+            if (selectedFrame && onContinue) onContinue();
+            else scroll('right');
+          }}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      ) : null}
+    </div>
   );
 };

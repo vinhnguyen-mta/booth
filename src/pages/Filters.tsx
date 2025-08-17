@@ -1,205 +1,83 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ToggleLeft, ToggleRight, Check, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { Layout } from '../components/Layout';
-import { FilterSelector } from '../components/FilterSelector';
-import { SkinSmoothingControl } from '../components/SkinSmoothingControl';
-import { translations } from '../i18n/translations';
+import styles from './Css.module.css';
 
 export const Filters: React.FC = () => {
   const navigate = useNavigate();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const { 
-    language, 
-    selectedFrame, 
-    capturedImages,
-    selectedFilter,
-    setSelectedFilter,
-    setFinalImage,
-    setCurrentStep
-  } = useAppStore();
-  const t = translations[language];
-  
-  const [fillMode, setFillMode] = useState(false);
-  const [processedImage, setProcessedImage] = useState<HTMLCanvasElement | null>(null);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [showImageSelector, setShowImageSelector] = useState(true);
+  const { language, selectedFrame, capturedImages = [], setCurrentStep, addCapturedImage, clearCapturedImages } = useAppStore();
 
-  // Initialize selected images based on frame panels
+  // redirect back to capture if no frame or no images
   useEffect(() => {
-    if (selectedFrame && capturedImages.length > 0) {
-      const requiredCount = selectedFrame.panels;
-      const initialSelection = capturedImages.slice(0, requiredCount);
-      setSelectedImages(initialSelection);
+    if (!selectedFrame || !capturedImages || capturedImages.length === 0) {
+      setCurrentStep(4);
+      navigate('/capture');
     }
-  }, [selectedFrame, capturedImages]);
+  }, [selectedFrame, capturedImages, navigate, setCurrentStep]);
 
+  // layout / panels
+  const panels = selectedFrame?.panels ?? 9;
+  const layout = selectedFrame?.layout ?? 'grid-3x3';
+
+  let cols = 3;
+  if (layout === 'single') cols = 1;
+  if (layout === 'strip-4') cols = 1;
+  if (layout === 'grid-2x2') cols = 2;
+  if (layout === 'grid-3x3') cols = 3;
+
+  // Left: slots equal to panels (initially empty)
+  const [assigned, setAssigned] = useState<Array<string | null>>(() => Array.from({ length: panels }, () => null));
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+
+  // Right: thumbnails from captured images (show up to 8)
+  const THUMB_COUNT = 8;
+  const thumbnails = capturedImages.slice(0, THUMB_COUNT);
+
+  // reset assigned slots when frame or captured images change (start empty)
   useEffect(() => {
-    if (selectedImages.length > 0) {
-      generatePreview();
-    }
-  }, [selectedFilter, selectedImages, fillMode]);
+    setAssigned(Array.from({ length: panels }, () => null));
+    setSelectedSlot(null);
+  }, [panels, selectedFrame, capturedImages]);
 
-  const generatePreview = async () => {
-    if (!canvasRef.current || !selectedFrame || selectedImages.length === 0) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas size based on frame layout
-    canvas.width = 800;
-    canvas.height = selectedFrame.layout === 'strip-4' ? 1200 : 800;
-
-    // Clear canvas
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw images based on layout
-    await drawImagesWithLayout(ctx, selectedImages, selectedFrame.layout);
-
-    // Draw frame overlay
-    await drawFrameOverlay(ctx, selectedFrame.svg);
-
-    // Save final image
-    const finalImageData = canvas.toDataURL('image/jpeg', 0.9);
-    setFinalImage(finalImageData);
+  const handleSlotClick = (idx: number) => {
+    // toggle selection
+    setSelectedSlot((s) => (s === idx ? null : idx));
   };
 
-  const drawImagesWithLayout = async (
-    ctx: CanvasRenderingContext2D,
-    images: string[],
-    layout: string
-  ) => {
-    const imagePromises = images.map(src => {
-      return new Promise<HTMLImageElement>((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.src = src;
+  const handleThumbnailClick = (url: string) => {
+    if (!url) return;
+    // prevent duplicate use
+    if (assigned.includes(url)) return;
+
+    if (selectedSlot !== null) {
+      setAssigned((prev) => {
+        const next = [...prev];
+        next[selectedSlot] = url;
+        return next;
       });
+      setSelectedSlot(null);
+      return;
+    }
+
+    const emptyIndex = assigned.findIndex((v) => v === null);
+    if (emptyIndex !== -1) {
+      setAssigned((prev) => {
+        const next = [...prev];
+        next[emptyIndex] = url;
+        return next;
+      });
+    }
+  };
+
+  const handleClearSlot = (idx: number) => {
+    setAssigned((prev) => {
+      const next = [...prev];
+      next[idx] = null;
+      return next;
     });
-
-    const loadedImages = await Promise.all(imagePromises);
-
-    // Apply filter
-    if (selectedFilter !== 'original') {
-      const filter = getFilterCSS(selectedFilter);
-      ctx.filter = filter;
-    }
-
-    switch (layout) {
-      case 'single':
-        if (loadedImages[0]) {
-          drawImageFit(ctx, loadedImages[0], 50, 50, 700, 700, fillMode ? 'cover' : 'contain');
-        }
-        break;
-      
-      case 'strip-4':
-        loadedImages.slice(0, 4).forEach((img, index) => {
-          const y = 50 + index * 275;
-          drawImageFit(ctx, img, 100, y, 600, 250, fillMode ? 'cover' : 'contain');
-        });
-        break;
-      
-      case 'grid-2x2':
-        loadedImages.slice(0, 4).forEach((img, index) => {
-          const col = index % 2;
-          const row = Math.floor(index / 2);
-          const x = 50 + col * 350;
-          const y = 50 + row * 350;
-          drawImageFit(ctx, img, x, y, 300, 300, fillMode ? 'cover' : 'contain');
-        });
-        break;
-
-      case 'grid-3x3':
-        loadedImages.slice(0, 9).forEach((img, index) => {
-          const col = index % 3;
-          const row = Math.floor(index / 3);
-          const x = 50 + col * 233;
-          const y = 50 + row * 233;
-          drawImageFit(ctx, img, x, y, 200, 200, fillMode ? 'cover' : 'contain');
-        });
-        break;
-    }
-
-    ctx.filter = 'none';
-  };
-
-  const drawImageFit = (
-    ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    mode: 'cover' | 'contain'
-  ) => {
-    const imgAspect = img.naturalWidth / img.naturalHeight;
-    const boxAspect = width / height;
-    
-    let drawWidth, drawHeight, drawX, drawY;
-    
-    if (mode === 'cover') {
-      if (imgAspect > boxAspect) {
-        drawHeight = height;
-        drawWidth = height * imgAspect;
-        drawX = x - (drawWidth - width) / 2;
-        drawY = y;
-      } else {
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        drawX = x;
-        drawY = y - (drawHeight - height) / 2;
-      }
-    } else {
-      if (imgAspect > boxAspect) {
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        drawX = x;
-        drawY = y + (height - drawHeight) / 2;
-      } else {
-        drawHeight = height;
-        drawWidth = height * imgAspect;
-        drawX = x + (width - drawWidth) / 2;
-        drawY = y;
-      }
-    }
-    
-    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-  };
-
-  const drawFrameOverlay = async (ctx: CanvasRenderingContext2D, svgString: string) => {
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(svgBlob);
-    
-    return new Promise<void>((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-        URL.revokeObjectURL(url);
-        resolve();
-      };
-      img.src = url;
-    });
-  };
-
-  const getFilterCSS = (filterId: string): string => {
-    const filters: Record<string, string> = {
-      'bw': 'grayscale(100%)',
-      'warm': 'sepia(30%) saturate(120%) hue-rotate(15deg)',
-      'cold': 'hue-rotate(180deg) saturate(120%)',
-      'vintage': 'sepia(50%) contrast(120%) brightness(90%)',
-      'cartoon': 'contrast(150%) saturate(150%) brightness(110%)',
-      'blur': 'blur(1px) brightness(110%)',
-      'dramatic': 'contrast(140%) saturate(80%) brightness(95%)',
-      'retro': 'sepia(40%) hue-rotate(320deg) saturate(120%)',
-      'neon': 'saturate(200%) contrast(120%) brightness(110%)'
-    };
-    return filters[filterId] || 'none';
+    setSelectedSlot(null);
   };
 
   const handleBack = () => {
@@ -209,223 +87,183 @@ export const Filters: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStep(6);
-    navigate('/preview');
-  };
-  
-  const handleImageProcessed = (image: HTMLCanvasElement) => {
-    setProcessedImage(image);
-    const finalImageData = image.toDataURL('image/jpeg', 0.95);
-    setFinalImage(finalImageData);
-  };
 
-  const handleImageSelect = (imageUrl: string, slotIndex: number) => {
-    const newSelection = [...selectedImages];
-    newSelection[slotIndex] = imageUrl;
-    setSelectedImages(newSelection);
+    clearCapturedImages()
+    const selectedImages = assigned.filter((url): url is string => !!url);
+    for (const image of selectedImages) {
+      addCapturedImage(image);
+    }
+
+    navigate('/filter-image', { state: { assigned } });
   };
 
-  const removeSelectedImage = (slotIndex: number) => {
-    const newSelection = [...selectedImages];
-    newSelection.splice(slotIndex, 1);
-    setSelectedImages(newSelection);
-  };
+  // Check if an image is already used in the frame
+  const isImageUsed = (url: string) => assigned.includes(url);
 
-  if (!selectedFrame || capturedImages.length === 0) {
-    navigate('/capture');
-    return null;
-  }
-
-  const requiredSlots = selectedFrame.panels;
+  // --- New: Left grid as 3x3 large preview (8 imgs + count tile) ---
+  const LEFT_COLS = 3;
+  const LEFT_ROWS = 3;
+  const TILE_W = 160;
+  const TILE_H = 120;
+  const leftSlots = Array.from({ length: LEFT_COLS * LEFT_ROWS }); // 9 slots (8 thumbnails + last count)
 
   return (
     <Layout>
-      <div className="step-container">
-        {/* Header */}
-        <div className="step-header flex items-center justify-between compact-spacing border-b bg-white/50 backdrop-blur-sm">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 text-dark hover:text-primary transition-colors"
-            aria-label={t.back}
-          >
-            <ArrowLeft className="w-5 h-5" />
-            {t.back}
-          </button>
-          
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-dark">{t.filtersTitle}</h1>
-            <p className="text-gray-600 compact-text">{t.filtersSubtitle}</p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {/* Fill mode toggle */}
-            <button
-              onClick={() => setFillMode(!fillMode)}
-              className="flex items-center gap-2 px-3 py-2 bg-white/80 hover:bg-white border border-gray-200 rounded-lg transition-colors"
-              title={fillMode ? 'Switch to Contain' : 'Fill Frame'}
-            >
-              {fillMode ? (
-                <ToggleRight className="w-5 h-5 text-primary" />
-              ) : (
-                <ToggleLeft className="w-5 h-5 text-gray-400" />
-              )}
-              <span className="compact-text font-medium">
-                {language === 'vi' ? 'Lấp đầy' : 'Fill'}
-              </span>
-            </button>
+      <div className="flex items-center justify-center bg-white p-8 gap-12" style={{ position: 'relative' }}>
+        {/* Left - larger 3x3 grid of thumbnails (last cell = count tile) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${LEFT_COLS}, ${TILE_W}px)`,
+            gap: 8,
+            padding: 8,
+            maxWidth: LEFT_COLS * TILE_W + (LEFT_COLS - 1) * 8
+          }}
+        >
+          {leftSlots.map((_, idx) => {
+            // last cell reserved for count/tile
+            if (idx === LEFT_COLS * LEFT_ROWS - 1) {
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    width: TILE_W,
+                    height: TILE_H,
+                    background: '#111827',
+                    color: '#fff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700
+                  }}
+                >
+                  <div style={{ fontSize: 12 }}>{language === 'vi' ? 'Vui lòng chọn ảnh' : 'Please select photos'}</div>
+                  <div style={{ fontSize: 28, marginTop: 6 }}>
+                    {assigned.filter(Boolean).length}/{panels}
+                  </div>
+                </div>
+              );
+            }
 
-            {/* Image selector toggle */}
-            <button
-              onClick={() => setShowImageSelector(!showImageSelector)}
-              className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-lg transition-colors"
-            >
-              <span className="compact-text font-medium">
-                {language === 'vi' ? 'Chọn ảnh' : 'Select Photos'}
-              </span>
-            </button>
-          </div>
+            const url = thumbnails[idx] ?? null;
+            const isUsed = url ? isImageUsed(url) : false;
+
+            return (
+              <div
+                key={idx}
+                onClick={() => url && !isUsed && handleThumbnailClick(url)}
+                style={{
+                  width: TILE_W,
+                  height: TILE_H,
+                  border: '1px solid #e5e7eb',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundImage: url ? `url(${url})` : undefined,
+                  backgroundColor: url ? undefined : '#f3f4f6',
+                  cursor: url && !isUsed ? 'pointer' : 'default',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {!url && <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>{language === 'vi' ? 'Trống' : 'Empty'}</span>}
+
+                {isUsed && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: 'rgba(220, 38, 38, 0.45)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: 16,
+                      fontWeight: 700
+                    }}
+                  >
+                    ✓
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <div className="step-content section-grid sidebar compact-spacing">
-          {/* Preview Area */}
-          <div className="section-card bg-gray-50 flex flex-col">
-            {/* Image Selector */}
-            {showImageSelector && (
-              <div className="mb-6 p-4 bg-white rounded-lg border-2 border-primary/20">
-                <h3 className="font-semibold text-dark mb-4">
-                  {language === 'vi' 
-                    ? `Chọn ${requiredSlots} ảnh cho khung:`
-                    : `Select ${requiredSlots} photos for frame:`
-                  }
-                </h3>
-                
-                {/* Selected Images Slots */}
-                <div className="grid grid-cols-4 gap-3 mb-4">
-                  {Array.from({ length: requiredSlots }).map((_, slotIndex) => (
-                    <div
-                      key={slotIndex}
-                      className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden"
-                    >
-                      {selectedImages[slotIndex] ? (
-                        <>
-                          <img
-                            src={selectedImages[slotIndex]}
-                            alt={`Selected ${slotIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            onClick={() => removeSelectedImage(slotIndex)}
-                            className="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                          <div className="absolute bottom-1 left-1 bg-black/70 text-white px-1 py-0.5 rounded text-xs">
-                            {slotIndex + 1}
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-gray-400 text-sm">
-                          {slotIndex + 1}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Available Images */}
-                <div className="grid grid-cols-6 gap-2">
-                  {capturedImages.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        const nextEmptySlot = selectedImages.findIndex(img => !img);
-                        if (nextEmptySlot !== -1) {
-                          handleImageSelect(image, nextEmptySlot);
-                        }
-                      }}
-                      className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors relative"
-                      disabled={selectedImages.includes(image)}
-                    >
-                      <img
-                        src={image}
-                        alt={`Photo ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      {selectedImages.includes(image) && (
-                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      )}
-                      <div className="absolute bottom-1 right-1 bg-black/70 text-white px-1 py-0.5 rounded text-xs">
-                        {index + 1}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Frame Preview */}
-            <div className="flex-1 flex items-center justify-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="max-w-lg w-full"
+        {/* Right - dynamic frame with empty slots (panels) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${cols}, 208px)`,
+            gap: 8,
+            padding: 8,
+            maxWidth: cols * 208 + (cols - 1) * 8
+          }}
+        >
+          {Array.from({ length: panels }).map((_, idx) => {
+            const url = assigned[idx];
+            const isSel = selectedSlot === idx;
+            return (
+              <div
+                key={idx}
+                onClick={() => handleSlotClick(idx)}
+                style={{
+                  width: 208,
+                  height: 144,
+                  border: isSel ? '3px solid #0ea45e' : '1px dashed #d1d5db',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundImage: url ? `url(${url})` : undefined,
+                  backgroundColor: url ? undefined : '#f8fafc',
+                  position: 'relative'
+                }}
               >
-                <div className={`image-container aspect-[4/5] bg-white rounded-lg shadow-lg relative ${fillMode ? 'fill-mode' : ''}`}>
-                  <canvas
-                    ref={canvasRef}
-                    className="w-full h-full rounded-lg"
-                  />
-                  <div className="safe-area-guide" />
-                </div>
-              </motion.div>
-            </div>
-          </div>
+                {!url && <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>{language === 'vi' ? 'Trống' : 'Empty'}</span>}
+                {url && isSel && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleClearSlot(idx); }}
+                    style={{
+                      position: 'absolute',
+                      right: 6,
+                      top: 6,
+                      background: 'rgba(0,0,0,0.6)',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '4px 6px',
+                      borderRadius: 4,
+                      cursor: 'pointer'
+                    }}
+                    aria-label="Clear slot"
+                  >
+                    X
+                  </button>
+                )}
+              </div>
+            );
+          })}
 
-          {/* Filter Sidebar */}
-          <div className="section-card">
-            {/* Skin Smoothing Control */}
-            <div className="mb-6">
-              <SkinSmoothingControl
-                image={selectedImages.length > 0 ? (() => {
-                  const img = new Image();
-                  img.src = selectedImages[0];
-                  return img;
-                })() : null}
-                onImageProcessed={handleImageProcessed}
-                language={language}
-              />
-            </div>
-            
-            <h3 className="text-base font-semibold text-dark mb-4">{t.filters}</h3>
-            
-            <FilterSelector
-              selectedFilter={selectedFilter}
-              onFilterSelect={setSelectedFilter}
-              language={language}
-            />
+          {/* Continue button area */}
+          <div style={{ width: 208, height: 144, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button onClick={handleContinue} className={styles.navButtonRight} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Fixed Navigation Buttons */}
-      <button
-        onClick={handleBack}
-        className="fixed-nav-button fixed-nav-back"
-        aria-label={t.back}
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span className="nav-button-text">{t.back}</span>
-      </button>
-
-      {selectedImages.length === requiredSlots && (
-        <button
-          onClick={handleContinue}
-          className="fixed-nav-button fixed-nav-continue"
-        >
-          {t.continue}
-        </button>
-      )}
     </Layout>
   );
 };
+
+export default Filters;

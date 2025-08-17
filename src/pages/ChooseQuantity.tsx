@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Minus } from 'lucide-react';
+import { Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { Layout } from '../components/Layout';
 import { translations } from '../i18n/translations';
+import { FrameSelector } from '../components/FrameSelector';
+
 
 export const ChooseQuantity: React.FC = () => {
   const navigate = useNavigate();
@@ -51,131 +53,82 @@ export const ChooseQuantity: React.FC = () => {
 
   return (
     <Layout>
-      <div className="step-content min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            {/* Left Column - Frame Preview */}
+      <div className="step-content min-h-screen flex items-center relative">
+        {/* Top centered banner */}
+        <div className="w-full absolute top-8 left-0 flex justify-center z-20">
+          <div className="bg-[#00167a] text-white rounded-b-xl px-6 py-2 font-bold text-lg text-center max-w-[520px]">
+            Vui lòng chọn số lượng ảnh in
+          </div>
+        </div>
+
+        {/* Left / Right nav arrows (styled to match other screens) */}
+        <button
+          aria-label="Prev"
+          onClick={handleBack}
+          className="absolute left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-[#00167a] text-white flex items-center justify-center shadow-lg z-20"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        <button
+          aria-label="Next"
+          onClick={handleContinue}
+          className="absolute right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-[#00167a] text-white flex items-center justify-center shadow-lg z-20"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
+        <div className="max-w-5xl w-full mx-auto px-6">
+          <div className="flex flex-col items-center justify-center gap-8">
+
+            {/* Frame preview */}
             <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="section-card w-full"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl p-8 flex items-center justify-center"
+              style={{ width: '100%' }}
             >
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-8 mb-6 relative overflow-hidden">
-                  {/* Background pattern */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="absolute inset-0" style={{
-                      backgroundImage: 'radial-gradient(circle at 2px 2px, #F34B52 1px, transparent 0)',
-                      backgroundSize: '20px 20px'
-                    }}></div>
-                  </div>
-
-                  <div
-                      className="w-full h-80 flex items-center justify-center relative z-10"
-                      dangerouslySetInnerHTML={{ __html: selectedFrame.svg }}
-                  />
-                </div>
-
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-dark mb-2">
-                    {language === 'vi' ? selectedFrame.name_vi : selectedFrame.name}
-                  </h3>
-                  <p className="text-xl font-bold text-primary mb-2">
-                    {formatPrice(selectedFrame.price)}{t.currency}
-                  </p>
-                  <p className="text-gray-600">
-                    {language === 'vi' ? 'Sẽ chụp 8 ảnh cho mỗi bản in' : 'Will take 8 photos for each print'}
-                  </p>
-                </div>
-              </div>
+              <div
+                className="w-56 md:w-64 lg:w-72 h-[320px] lg:h-[420px] flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: selectedFrame.svg }}
+              />
             </motion.div>
 
-            {/* Right Column - Quantity Control */}
-            <div className="section-card">
-              <div className="space-y-8">
-                {/* Print Quantity Selector */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-center"
+            {/* Quantity controls & price (centered like image) */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-xl text-gray-700 disabled:opacity-50"
+                  aria-label="Decrease quantity"
                 >
-                  <h2 className="text-2xl font-bold text-dark mb-6">{t.quantity}</h2>
+                  <Minus className="w-4 h-4" />
+                </button>
 
-                  <div className="flex items-center justify-center gap-6 mb-4">
-                    <button
-                        onClick={decrementQuantity}
-                        disabled={quantity <= 1}
-                        className="w-14 h-14 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105"
-                        aria-label="Decrease quantity"
-                    >
-                      <Minus className="w-6 h-6" />
-                    </button>
+                <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-lg font-bold shadow-sm">
+                  {quantity}
+                </div>
 
-                    <motion.div
-                        key={quantity}
-                        initial={{ scale: 1.2 }}
-                        animate={{ scale: 1 }}
-                        className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-xl"
-                    >
-                      {quantity}
-                    </motion.div>
-
-                    <button
-                        onClick={incrementQuantity}
-                        disabled={quantity >= 10}
-                        className="w-14 h-14 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105"
-                        aria-label="Increase quantity"
-                    >
-                      <Plus className="w-6 h-6" />
-                    </button>
-                  </div>
-
-                  <p className="text-gray-600 text-lg">
-                    {language === 'vi'
-                        ? `${quantity} bản in`
-                        : `${quantity} prints`
-                    }
-                  </p>
-                </motion.div>
-
-                {/* Total Price */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-center"
+                <button
+                  onClick={incrementQuantity}
+                  disabled={quantity >= 10}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-xl text-gray-700 disabled:opacity-50"
+                  aria-label="Increase quantity"
                 >
-                  <div className="bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl p-6 text-white relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10"></div>
-                    <h3 className="text-xl font-semibold mb-2 relative z-10">{t.totalPrice}</h3>
-                    <div className="text-4xl font-bold relative z-10">
-                      {formatPrice(totalPrice)}{t.currency}
-                    </div>
-                  </div>
-                </motion.div>
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="text-center mt-2">
+                <div className={`font-bold text-base text-[#00167a]`} style={{ fontSize: '2.5rem' }}>
+                  {formatPrice(totalPrice)}{t.currency}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Fixed Navigation Buttons */}
-      <button
-        onClick={handleBack}
-        className="fixed-nav-button fixed-nav-back"
-        aria-label={t.back}
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="nav-button-text">{t.back}</span>
-      </button>
-
-      <button
-        onClick={handleContinue}
-        className="fixed-nav-button fixed-nav-continue"
-      >
-        {t.continue}
-      </button>
     </Layout>
   );
 };

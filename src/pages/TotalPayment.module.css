@@ -1,0 +1,151 @@
+:root {
+  --primary: #00167a;
+  --muted: #f6f8ff;
+  --card-bg: #ffffff;
+}
+
+.container {
+  position: relative;
+  padding: 28px 18px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.header {
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+.title {
+  color: rgb(36 68 139);
+  font-weight: 900;
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #0843a1;
+  font-weight: bold;
+}
+.note2 {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #000000;
+  font-weight: bold;
+}
+
+/* main three-column area */
+.main {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+/* left / right columns (labels) */
+.col {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.colTitle {
+    font-size: 1em;
+    font-weight: 700;
+    font-style: normal;
+    color: rgb(36, 68, 139);
+    font-kerning: none;
+    text-decoration-line: none;
+    text-decoration-thickness: initial;
+    text-decoration-style: initial;
+}
+.colTitle2 {
+    font-size: 1em;
+    font-weight: 700;
+    font-style: normal;
+    color: rgb(6, 7, 7);
+    font-kerning: none;
+    text-decoration-line: none;
+    text-decoration-thickness: initial;
+    text-decoration-style: initial;
+}
+.colSub {
+  height: 12px;
+}
+
+/* center big icon */
+.colCenter {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.iconWrap {
+  width: 120px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  box-shadow: 0 16px 36px rgba(0,22,122,0.08);
+  background: #fff;
+}
+.hint {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* small center dot under icon */
+.centerDot {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  border-radius: 999px;
+  margin-top: 6px;
+  box-shadow: 0 8px 16px rgba(0,22,122,0.12);
+}
+
+/* amount block on right */
+.amount {
+  margin-top: 8px;
+  font-weight: 900;
+  color: var(--primary);
+  font-size: 20px;
+}
+
+/* nav buttons (match other screens) */
+.navButtonLeft,
+.navButtonRight {
+  position: fixed; /* fixed -> nằm sát viewport */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.14);
+  border: none;
+  z-index: 60;
+}
+
+/* flush to the very left / right of the viewport with small inset */
+.navButtonLeft { left: 12px; }
+.navButtonRight { right: 12px; }
+
+/* responsive: on small screens move buttons into top corners */
+@media (max-width: 900px) {
+  .main { flex-direction: column; gap: 18px; }
+  .col, .colCenter { width: 100%; }
+  .iconWrap { width: 160px; height: 180px; }
+  .navButtonLeft { left: 8px; top: 12px; transform: none; }
+  .navButtonRight { right: 8px; top: 12px; transform: none; }
+}

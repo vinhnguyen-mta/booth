@@ -83,10 +83,10 @@ export const Layout: React.FC<LayoutProps> = ({
       </div>
       
       {/* Top controls */}
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
-        {showLanguageToggle && <LanguageToggle />}
-        {/*{showFullscreenButton && <FullscreenButton language={language} />}*/}
-      </div>
+      {/*<div className="absolute top-4 right-4 z-50 flex items-center gap-3">*/}
+      {/*  {showLanguageToggle && <LanguageToggle />}*/}
+      {/*  /!*{showFullscreenButton && <FullscreenButton language={language} />}*!/*/}
+      {/*</div>*/}
       
       <motion.main
         initial={{ opacity: 0 }}

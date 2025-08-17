@@ -1,0 +1,39 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.fullscreenPrompt {
+  text-align: center;
+  padding: 20px;
+}
+
+.fullscreenButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.fullscreenButton:hover {
+  transform: scale(1.1);
+}
+
+.fullscreenButton svg {
+  width: 48px;
+  height: 48px;
+}
+
+.fullscreenButton span {
+  font-size: 14px;
+  font-weight: 500;
+}

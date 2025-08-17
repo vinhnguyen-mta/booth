@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock } from 'lucide-react';
 import QRCode from 'qrcode';
+import styles from './QRModal.module.css';
 
 interface QRModalProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export const QRModal: React.FC<QRModalProps> = ({
     if (isOpen && paymentData) {
       generateQRCode();
       calculateTimeLeft();
-      
+
       const timer = setInterval(() => {
         calculateTimeLeft();
       }, 1000);
@@ -38,14 +39,13 @@ export const QRModal: React.FC<QRModalProps> = ({
 
   const generateQRCode = async () => {
     try {
-      // Mock payment URL - in real app, this would be from backend
       const paymentUrl = `https://payment.example.com/pay/${paymentData.paymentId}?amount=${paymentData.amount}`;
       const dataUrl = await QRCode.toDataURL(paymentUrl, {
-        width: 256,
+        width: 512,
         margin: 2,
         color: {
-          dark: '#F34B52',
-          light: '#FFFFFF'
+          dark: '#00167a',
+          light: '#ffffff'
         }
       });
       setQrDataUrl(dataUrl);
@@ -58,7 +58,7 @@ export const QRModal: React.FC<QRModalProps> = ({
     const now = new Date().getTime();
     const expires = new Date(paymentData.expiresAt).getTime();
     const difference = expires - now;
-    
+
     if (difference > 0) {
       setTimeLeft(Math.floor(difference / 1000));
     } else {
@@ -73,9 +73,8 @@ export const QRModal: React.FC<QRModalProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN').format(price);
-  };
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('vi-VN').format(price);
 
   return (
     <AnimatePresence>
@@ -84,73 +83,54 @@ export const QRModal: React.FC<QRModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className={styles.overlay}
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6"
+            exit={{ scale: 0.9, opacity: 0 }}
+            className={styles.modal}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-dark">
-                {language === 'vi' ? 'Quét mã QR để thanh toán' : 'Scan QR to Pay'}
-              </h3>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+              <X className={styles.closeIcon} />
+            </button>
 
-            {/* QR Code */}
-            <div className="text-center mb-6">
-              {qrDataUrl && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="bg-white p-4 rounded-lg shadow-inner inline-block mb-4"
-                >
-                  <img src={qrDataUrl} alt="Payment QR Code" className="w-48 h-48" />
-                </motion.div>
-              )}
-              
-              <div className="text-2xl font-bold text-primary mb-2">
-                {formatPrice(paymentData.amount)}₫
+            <header className={styles.header}>
+              <h4 className={styles.title}>
+                {language === 'vi'
+                  ? 'VUI LÒNG QUÉT MÃ THANH TOÁN DƯỚI ĐÂY BẰNG ỨNG DỤNG NGÂN HÀNG HOẶC VÍ ĐIỆN TỬ CỦA BẠN'
+                  : 'PLEASE SCAN QR-CODE FOR PAYMENT'}
+              </h4>
+
+              <p>
+                PLEASE SCAN QR-CODE WITH YOUR MOBILE BANKING OR E-WALLET APPLICATION
+              </p>
+
+            </header>
+
+            <div className={styles.center}>
+              <div className={styles.qrWrap}>
+                <div className={styles.scanPill}>
+                  SCAN ME
+                </div>
+
+                <div className={styles.qrBox}>
+                  {qrDataUrl ? (
+                    <img src={qrDataUrl} alt="QR Code" className={styles.qrImage} />
+                  ) : (
+                    <div className={styles.qrPlaceholder} />
+                  )}
+                </div>
               </div>
-              
-              <p className="text-gray-600 text-sm">
-                {language === 'vi' 
-                  ? 'Sử dụng ứng dụng ngân hàng để quét mã QR'
-                  : 'Use your banking app to scan the QR code'
-                }
-              </p>
-            </div>
 
-            {/* Timer */}
-            <div className="flex items-center justify-center gap-2 text-gray-600 mb-6">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">
-                {language === 'vi' ? 'Thời gian còn lại:' : 'Time remaining:'} {formatTime(timeLeft)}
-              </span>
-            </div>
-
-            {/* Instructions */}
-            <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
-              <p className="mb-2 font-medium">
-                {language === 'vi' ? 'Hướng dẫn:' : 'Instructions:'}
-              </p>
-              <ol className="list-decimal list-inside space-y-1">
-                <li>{language === 'vi' ? 'Mở ứng dụng ngân hàng' : 'Open your banking app'}</li>
-                <li>{language === 'vi' ? 'Chọn chức năng quét QR' : 'Select QR scan function'}</li>
-                <li>{language === 'vi' ? 'Quét mã QR trên màn hình' : 'Scan the QR code on screen'}</li>
-                <li>{language === 'vi' ? 'Xác nhận thanh toán' : 'Confirm payment'}</li>
-              </ol>
+              <div className={styles.timer}>
+                <Clock className={styles.timerIcon} />
+                <span className={styles.timerText}>
+                  {language === 'vi' ? 'Thời gian còn lại:' : 'Time remaining:'} {formatTime(timeLeft)}
+                </span>
+              </div>
             </div>
           </motion.div>
         </motion.div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { Layout } from '../components/Layout';
@@ -26,66 +25,36 @@ export const ChooseFrame: React.FC = () => {
   };
 
   const handleFrameSelect = (frame: Frame) => {
-    setSelectedFrame(frame);
+    // toggle selection: click again sẽ bỏ chọn
+    if (selectedFrame?.id === frame.id) {
+      setSelectedFrame(null);
+    } else {
+      setSelectedFrame(frame);
+    }
   };
 
   return (
     <Layout>
       <div className="step-container">
-        {/* Header */}
-        {/*<div className="step-header flex items-center justify-between compact-spacing border-b bg-white/50 backdrop-blur-sm p-2">*/}
-        {/*  <button*/}
-        {/*      onClick={handleBack}*/}
-        {/*      className="flex items-center gap-2 text-dark hover:text-primary transition-colors text-sm"*/}
-        {/*      aria-label={t.back}*/}
-        {/*  >*/}
-        {/*    <ArrowLeft className="w-4 h-4" />*/}
-        {/*    {t.back}*/}
-        {/*  </button>*/}
+        {/* Top banner title */}
+        <div className="w-full flex justify-center mb-6 mt-5">
+          <div style={{ backgroundColor: '#00167a' }} className="text-white rounded-t-3xl px-8 py-3 font-bold text-lg max-w-[620px] text-center">
+            Vui lòng chọn khung
+          </div>
+        </div>
 
-        {/*  <div className="text-center">*/}
-        {/*    <h1 className="text-lg font-bold text-dark">{t.chooseFrameTitle}</h1>*/}
-        {/*    <p className="text-gray-600 compact-text text-sm">{t.chooseFrameSubtitle}</p>*/}
-        {/*  </div>*/}
-
-        {/*  <div className="w-12" /> /!* Spacer (nhỏ lại) *!/*/}
-        {/*</div>*/}
-
-
-        {/* UPDATE: Content with section-based layout */}
         <div className="step-content compact-spacing">
-          <div className="section-card">
+          <div className="section-card" style={{ backgroundColor: 'rgba(149, 173, 255, 0.11)' }}>
             <FrameSelector
               selectedFrame={selectedFrame}
               onFrameSelect={handleFrameSelect}
+              onBack={handleBack}
+              onContinue={handleContinue}
               language={language}
             />
           </div>
         </div>
-
-        {/* Continue Button */}
       </div>
-
-      {/* Fixed Navigation Buttons */}
-      <button
-        onClick={handleBack}
-        className="fixed-nav-button fixed-nav-back"
-        aria-label={t.back}
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span className="nav-button-text">{t.back}</span>
-      </button>
-
-      {selectedFrame && (
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          onClick={handleContinue}
-          className="fixed-nav-button fixed-nav-continue"
-        >
-          {t.continue}
-        </motion.button>
-      )}
     </Layout>
   );
 };

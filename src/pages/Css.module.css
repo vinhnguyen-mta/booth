@@ -1,0 +1,145 @@
+:root {
+    --primary: #00167a;
+    --muted: #f6f8ff;
+    --card-bg: #ffffff;
+}
+
+.stepContainer {
+    position: relative;
+    padding: 28px 18px 80px;
+}
+
+.passwordLeftEn, .voucherLabel {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 35px;
+    letter-spacing: 0.03em;
+}
+
+.passwordLeftVn {
+    font-weight: 600;
+}
+
+/* main content layout */
+.content {
+    display: grid;
+    gap: 28px;
+    align-items: start;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.voucherCard {
+    background: var(--card-bg);
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(2, 6, 23, 0.04);
+}
+
+.voucherRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.voucherInput {
+    flex: 0.8;
+    background: linear-gradient(90deg, var(--primary), var(--primary));
+    height: 44px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 0 16px;
+    font-weight: 700;
+    box-shadow: 0 8px 28px rgba(0, 22, 122, 0.12);
+}
+
+.voucherText {
+    letter-spacing: 0.12em;
+    font-family: monospace;
+}
+
+.passwordLeft {
+    flex: 0.8;
+}
+
+.passwordLeftTop {
+    padding-left: 30px;
+    padding-bottom: 15px;
+}
+
+.passwordLeftTop {
+    padding-left: 30px;
+    padding-bottom: 15px;
+}
+
+/* keypad wrapper: override NumericKeypad button styles if present */
+.keypadWrap {
+    zoom: 150%;
+    width: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keypadWrap button {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    width: 44px !important;
+    height: 44px !important;
+    box-shadow: 0 8px 22px rgba(2, 6, 23, 0.12) !important;
+    border: none !important;
+    margin: 6px !important;
+    font-weight: 700 !important;
+}
+
+/* nav arrows (left/right) consistent with other screens */
+.navButtonLeft,
+.navButtonRight {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.14);
+    border: none;
+    z-index: 30;
+}
+
+.navButtonLeft {
+    left: 18px;
+}
+
+.navButtonRight {
+    right: 18px;
+}
+
+/* responsive adjustments */
+@media (max-width: 980px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .keypadWrap {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 12px;
+    }
+
+    .voucherRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+}
