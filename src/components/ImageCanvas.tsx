@@ -101,6 +101,8 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
             ? selectedFrame.code === "1x4_vertical_small"
               ? "w-[300px] h-[700px]"
               : "h-[700px]"
+            : selectedFrame.code === "1x3_horizontal_small"
+            ? "h-[300px] w-[600px]"
             : "h-[600px]"
           : selectedFrame.code === "1x4_horizontal_large"
           ? "h-[400px]"
@@ -135,7 +137,7 @@ async function drawImagesWithLayout(
   switch (layout) {
     case "1x1_vertical_large":
       if (loadedImages[0]) {
-        drawImageFit(ctx, loadedImages[0], 40, 120, 720, 600, "stretch");
+        drawImageFit(ctx, loadedImages[0], 40, 70, 720, 600, "stretch");
       }
       break;
     case "1x2_vertical_large":
@@ -165,7 +167,7 @@ async function drawImagesWithLayout(
         const col = index % 2;
         const row = Math.floor(index / 2);
         const x = 40 + col * 380;
-        const y = 180 + row * (280+ 40);
+        const y = 180 + row * (280 + 40);
         drawImageFit(ctx, img, x, y, 340, 200, "stretch");
       });
       break;
@@ -196,9 +198,12 @@ async function drawImagesWithLayout(
       });
       break;
     case "1x3_horizontal_small":
-      loadedImages.slice(0, 8).forEach((img, index) => {
-        const y = 80 + index * (250 + 100);
-        drawImageFit(ctx, img, 100, y, 600, 300, fillMode);
+      loadedImages.slice(0, 3).forEach((img, index) => {
+        const col = index % 3;
+        const row = Math.floor(index / 3);
+        const x = 72 + col * 350;
+        const y = 130 + row * (310 + 20);
+        drawImageFit(ctx, img, x, y, 300, 300, "stretch");
       });
       break;
   }
@@ -263,7 +268,6 @@ async function drawFrameOverlay(
   svg: string,
   frame?: any
 ) {
-
   const blob = new Blob([svg], { type: "image/svg+xml" });
   const url = URL.createObjectURL(blob);
 

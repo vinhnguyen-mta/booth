@@ -158,17 +158,67 @@ export async function getFilters(): Promise<Filter[]> {
   }
 }
 
-export async function getFiltersFrame(layout_code: any): Promise<Filter[]> {
+export async function print(img): Promise<any[]> {
   try {
-    const response = await fetch(import.meta.env.VITE_API_URL + "frames"  ,    {
+    const response = await fetch(
+      import.meta.env.VITE_API_URL_PRINT + "print",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          layout_code,
+          image_base64: img,
+          print_size: "6x4",
+          copies: 1,
+        }
+      ),
+      }
+    );
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading filters:", error);
+    return [];
+  }
+}
+
+export async function printFilters(img): Promise<any[]> {
+  try {
+    const response = await fetch(
+      import.meta.env.VITE_API_URL_PRINT + "filters",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image_path: img,
+          print_size: "6x4",
+          cut_2inch: true,
+          copies: 1,
         }),
-      });
+      }
+    );
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading filters:", error);
+    return [];
+  }
+}
+
+export async function getFiltersFrame(layout_code: any): Promise<Filter[]> {
+  try {
+    const response = await fetch(import.meta.env.VITE_API_URL + "frames", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        layout_code,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -199,7 +249,6 @@ export async function getPaymentCompany(): Promise<PaymentCompany[]> {
     return [];
   }
 }
-
 
 // TODO: Replace with real API call
 export async function createPayment(

@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import styles from "./Css.module.css";
 import { useLocation } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore.ts";
+import { print } from "../services/api.ts";
 
 export const ExportImage: React.FC = () => {
   const navigate = useNavigate();
+  const { finalImage } = useAppStore();
+
+  useEffect(() => {
+    const loadPrint = async () => {
+      try {
+        await print(finalImage);
+        setTimeout(() => {
+          navigate("/qr-download", { state: { fillMode, capturedImages } });
+        }, 10000);
+      } catch (error) {
+        console.error("Error loading filters:", error);
+      }
+    };
+    loadPrint();
+  }, []);
 
   const handleBack = () => {
     navigate("/filter-image");
@@ -16,8 +32,6 @@ export const ExportImage: React.FC = () => {
   const handleNext = () => {
     navigate("/qr-download", { state: { fillMode, capturedImages } });
   };
-
-  const { finalImage } = useAppStore();
 
   const location = useLocation();
   const { fillMode, capturedImages } = location.state || {}; // lấy state truyền qua
