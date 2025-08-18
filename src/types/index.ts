@@ -7,12 +7,15 @@ export interface AppState {
   quantity: number;
   capturedImages: string[];
   capturedVideos: string[]; // UPDATE: Add video support
-  selectedFilter: string;
+  selectedFilter: string | null;
   finalImage: string | null;
   paymentMethod: "cash" | "qr" | null;
   paymentStatus: "pending" | "processing" | "success" | "failed";
   language: "en" | "vi";
   totalPrice: number;
+  icons: string;
+  selectedImg: any | null;
+  frames: any
 }
 
 // UPDATE: Payment interfaces moved to services/api.ts

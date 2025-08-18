@@ -13,7 +13,7 @@ interface AppStore extends AppState {
   addCapturedVideo: (video: string) => void;
   clearCapturedImages: () => void;
   clearCapturedVideos: () => void;
-  setSelectedFilter: (filter: string) => void;
+  setSelectedFilter: (filter: string | null) => void;
   setFinalImage: (image: string | null) => void;
   setPaymentMethod: (method: "cash" | "qr" | null) => void;
   setPaymentStatus: (
@@ -29,6 +29,9 @@ interface AppStore extends AppState {
   // UPDATE: Fullscreen state management
   isFullscreen: boolean;
   setFullscreen: (isFullscreen: boolean) => void;
+  setIcons: (icon: string) => void;
+  setFrame: (frame: string) => void;
+  setSelectedImg: (img: any)=> void;
 }
 
 const initialState: AppState = {
@@ -44,6 +47,8 @@ const initialState: AppState = {
   paymentStatus: "pending",
   language: "vi",
   totalPrice: 0,
+  selectedImg: null,
+  frames: []
 };
 
 export const useAppStore = create<AppStore>()(
@@ -83,7 +88,11 @@ export const useAppStore = create<AppStore>()(
       setSelectedFilter: (filter) => set({ selectedFilter: filter }),
 
       setFinalImage: (image) => set({ finalImage: image }),
-
+      setIcons: (icon) => set({ icons: icon }),
+      setFrame: (frame) => set({ frames: frame }),
+      setSelectedImg:  (img)=> {
+        set({ selectedImg: img });
+      },
       setPaymentMethod: (method) => set({ paymentMethod: method }),
 
       setPaymentStatus: (status) => set({ paymentStatus: status }),

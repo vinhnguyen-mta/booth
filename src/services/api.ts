@@ -36,6 +36,27 @@ export interface Filter {
   icon: string;
 }
 
+export interface Icons {
+  file_path: string;
+  id: string;
+  name: string;
+  type: string;
+  uuid: string;
+}
+
+export interface PaymentCompany {
+  id: string;
+  name: string;
+  name_vi: string;
+  type: string;
+  icon: string;
+  color: string;
+  description: string;
+  description_vi: string;
+  enabled: boolean;
+  processing_time: string;
+}
+
 export interface PaymentMethod {
   id: string;
   name: string;
@@ -87,6 +108,7 @@ export interface VoucherValidation {
   valid: boolean;
   discountAmount: number;
   message: string;
+  type?: "fixed" | "percentage";
 }
 
 // TODO: Replace with real API call
@@ -113,12 +135,42 @@ export async function getFrames(): Promise<Frame[]> {
   }
 }
 
+export async function getIcons(): Promise<Icons[]> {
+  try {
+    const response = await fetch(import.meta.env.VITE_API_URL + "icons");
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading frames:", error);
+    return [];
+  }
+}
+
 // TODO: Replace with real API call
 export async function getFilters(): Promise<Filter[]> {
   try {
-    const response = await fetch("/data/filters.json");
+    const response = await fetch(import.meta.env.VITE_API_URL + "filter");
     const data = await response.json();
-    return data.filters;
+    return data.data;
+  } catch (error) {
+    console.error("Error loading filters:", error);
+    return [];
+  }
+}
+
+export async function getFiltersFrame(layout_code: any): Promise<Filter[]> {
+  try {
+    const response = await fetch(import.meta.env.VITE_API_URL + "frames"  ,    {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          layout_code,
+        }),
+      });
+    const data = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error loading filters:", error);
     return [];
@@ -137,13 +189,27 @@ export async function getPaymentMethods(): Promise<PaymentMethod[]> {
   }
 }
 
+export async function getPaymentCompany(): Promise<PaymentCompany[]> {
+  try {
+    const response = await fetch(import.meta.env.VITE_API_URL + "company");
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading payment methods:", error);
+    return [];
+  }
+}
+
+
 // TODO: Replace with real API call
 export async function createPayment(
   amount: number,
-  currency: string = "VND",
+  currency: string = "VND"
 ): Promise<PaymentResponse> {
   // Mock payment creation
-  const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const paymentId = `pay_${Date.now()}_${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
 
   // Mock QR code generation
@@ -173,7 +239,7 @@ export async function createPayment(
 
 // TODO: Replace with real API call
 export async function checkPaymentStatus(
-  paymentId: string,
+  paymentId: string
 ): Promise<PaymentStatus> {
   // Mock payment status check
   // In real implementation, this would check with payment gateway
@@ -210,7 +276,7 @@ export async function uploadPhoto(file: File): Promise<UploadResponse> {
 // TODO: Replace with real API call
 export async function uploadVideo(
   blob: Blob,
-  filename: string = "video.webm",
+  filename: string = "video.webm"
 ): Promise<UploadResponse> {
   // Mock video upload
   // In real implementation, this would upload to cloud storage
@@ -230,30 +296,36 @@ export async function uploadVideo(
 
 // TODO: Replace with real API call
 export async function validateVoucher(
-  code: string,
+  code: string
 ): Promise<VoucherValidation> {
   try {
-    const response = await fetch("/data/vouchers.json");
-    const data = await response.json();
-    const voucher = data.vouchers.find(
-      (v: Voucher) => v.code.toLowerCase() === code.toLowerCase() && v.active,
+    const response = await fetch(
+      import.meta.env.VITE_API_URL + "voucher/checkin",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+        }),
+      }
     );
-
-    if (voucher) {
+    const dataJson = await response.json();
+    const data = dataJson?.data;
+    console.log("data", data);
+    if (data) {
       // Check if voucher is still valid
       const now = new Date();
-      const validFrom = new Date(voucher.valid_from);
-      const validUntil = new Date(voucher.valid_until);
+      const validFrom = new Date(data.start_date);
+      const validUntil = new Date(data.end_date);
 
-      if (
-        now >= validFrom &&
-        now <= validUntil &&
-        voucher.used_count < voucher.max_uses
-      ) {
+      if (now >= validFrom && now <= validUntil && data.status === "active") {
         return {
           valid: true,
-          discountAmount: voucher.discount_value,
-          message: voucher.description,
+          discountAmount: data.value,
+          message: data.description,
+          type: data.discount_type,
         };
       }
     }
@@ -281,7 +353,7 @@ export function formatPrice(price: number, currency: string = "VND"): string {
 // Utility function to calculate discount
 export function calculateDiscount(
   originalAmount: number,
-  voucher: { discount_type: string; discount_value: number },
+  voucher: { discount_type: string; discount_value: number }
 ): number {
   if (voucher.discount_type === "percentage") {
     return Math.round(originalAmount * (voucher.discount_value / 100));

@@ -11,6 +11,7 @@ import {
   validateVoucher,
   getPaymentMethods,
   PaymentMethod,
+  getPaymentCompany,
 } from "../services/api";
 import { translations } from "../i18n/translations";
 import styles from "./Payment.module.css";
@@ -27,11 +28,13 @@ export const Payment: React.FC = () => {
   const [discountApplied, setDiscountApplied] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
+  const [company, setCompany] = useState<any>(null);
 
   const finalPrice = totalPrice - discountApplied;
 
   useEffect(() => {
     loadPaymentMethods();
+    loadPaymentCompany();
   }, []);
 
   const loadPaymentMethods = async () => {
@@ -40,6 +43,18 @@ export const Payment: React.FC = () => {
       setPaymentMethods(methods);
     } catch (error) {
       console.error("Error loading payment methods:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const loadPaymentCompany = async () => {
+    try {
+      const companyApi = await getPaymentCompany();
+      console.log("companyApi", companyApi);
+      setCompany(companyApi);
+    } catch (error) {
+      console.error("Error loading payment company:", error);
     } finally {
       setLoading(false);
     }
@@ -62,7 +77,15 @@ export const Payment: React.FC = () => {
     if (!voucherCode) return;
     try {
       const result = await validateVoucher(voucherCode);
-      if (result.valid) setDiscountApplied(result.discountAmount);
+      if (result.valid) {
+        let discount = 0;
+        if (result.type === "percentage") {
+          discount = (totalPrice * result.discountAmount) / 100;
+        } else {
+          discount = result.discountAmount;
+        }
+        setDiscountApplied(discount);
+      }
     } catch (error) {
       console.error("Error validating voucher:", error);
     }
@@ -71,7 +94,7 @@ export const Payment: React.FC = () => {
   const handleCashPayment = () => {
     setPaymentMethod("cash");
     setCurrentStep(3);
-    navigate('/total-payment');
+    navigate("/total-payment");
     setShowCashModal(true);
   };
 
@@ -367,6 +390,7 @@ export const Payment: React.FC = () => {
           onClose={() => setShowQRModal(false)}
           paymentData={mockPaymentData}
           language={language}
+          company={company}
         />
       </div>
     </Layout>

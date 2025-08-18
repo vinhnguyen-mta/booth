@@ -97,7 +97,7 @@ export const TotalPayment: React.FC = () => {
               VUI LÒNG CHO THÊM TIỀN VÀO MÁY
             </div>
             <div className={styles.colTitle2}>PLEASE INSERT BANKNOTE</div>
-            <div className={styles.amount}>{formatPrice(totalPrice)} VND</div>
+            <div className={styles.amount}>{formatPrice(0)} VND</div>
           </div>
         </main>
 

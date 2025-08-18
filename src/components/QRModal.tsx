@@ -13,6 +13,7 @@ interface QRModalProps {
     expiresAt: string;
   };
   language: "en" | "vi";
+  company: any;
 }
 
 export const QRModal: React.FC<QRModalProps> = ({
@@ -20,6 +21,7 @@ export const QRModal: React.FC<QRModalProps> = ({
   onClose,
   paymentData,
   language,
+  company
 }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -40,7 +42,7 @@ export const QRModal: React.FC<QRModalProps> = ({
   const generateQRCode = async () => {
     try {
       const paymentUrl = `https://payment.example.com/pay/${paymentData.paymentId}?amount=${paymentData.amount}`;
-      const dataUrl = await QRCode.toDataURL(paymentUrl, {
+      const dataUrl = await QRCode.toDataURL(company?.qr_code_path ? company?.qr_code_path : paymentUrl, {
         width: 512,
         margin: 2,
         color: {

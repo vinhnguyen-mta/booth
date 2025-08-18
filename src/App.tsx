@@ -5,7 +5,7 @@ import { Landing } from "./pages/Landing";
 import { ChooseFrame } from "./pages/ChooseFrame";
 import { ChooseQuantity } from "./pages/ChooseQuantity";
 import { Payment } from "./pages/Payment";
-import { Capture } from "./pages/Capture";
+import { Capture } from "./pages/Capture1";
 import { Filters } from "./pages/Filters";
 import { Preview } from "./pages/Preview";
 import { Password } from "./pages/Password";

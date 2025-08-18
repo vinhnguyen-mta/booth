@@ -4,18 +4,94 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { Layout } from "../components/Layout";
 import styles from "./Css.module.css";
+import clsx from "clsx";
+import { ListImageSelected } from "./ListImageSelected";
 
 export const ListImage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setCurrentStep } = useAppStore();
+
+  const {
+    setCurrentStep,
+    capturedImages = [],
+    selectedFrame,
+    setSelectedImg,
+  } = useAppStore();
+  const [maxSelected, setMaxSelected] = useState(1);
+
+  const THUMB_COUNT = 8;
+  const thumbnails = capturedImages.slice(0, THUMB_COUNT);
+
+  // reset assigned slots when frame or captured images change (start empty)
+  useEffect(() => {
+    console.log("thumbnails", thumbnails);
+    console.log("selectedFrame", selectedFrame);
+    if (selectedFrame.slots) {
+      console.log("selectedFrame.slots", selectedFrame.slots);
+      setMaxSelected(selectedFrame.slots);
+    }
+  }, [selectedFrame, capturedImages]);
 
   const handleBack = () => {
     setCurrentStep(2);
     navigate("/wait-capture");
   };
 
+  const getTotalImg = (selectedFrame) => {
+    switch (selectedFrame.code) {
+      case "single":
+        return 1;
+    }
+  };
+
+  const styleFrame = () => {
+    switch (selectedFrame.code) {
+      case "1x1_vertical_large":
+        return "w-[30vw] h-[70vh]";
+      case "1x2_vertical_large":
+        return "w-[30vw] h-[35vh]";
+      case "2x2_vertical_large":
+        return "w-[150px] h-[200px]";
+      case "1x4_vertical_small":
+        return "w-[165px] h-[102px]";
+      case "1x4_horizontal_large":
+        return "w-[200px] h-[150px]";
+      case "2x3_vertical_large":
+        return "w-[150px] h-[200px]";
+      case "2x4_vertical_large":
+        return "w-[100px] h-[130px]";
+      case "1x3_horizontal_small":
+        return "w-[12vw] h-[25vh]";
+      default:
+        return "w-[30vw] h-[70vh]";
+    }
+  };
+
+  const styleFrameBody = () => {
+    switch (selectedFrame.code) {
+      case "1x1_vertical_large":
+        return "flex flex-col";
+      case "1x2_vertical_large":
+        return "flex flex-col";
+      case "2x2_vertical_large":
+        return "grid grid-cols-2 gap-4";
+      case "1x4_vertical_small":
+        return "flex flex-col";
+      case "1x4_horizontal_large":
+        return "grid grid-cols-2 gap-4";
+      case "2x3_vertical_large":
+        return "grid grid-cols-2 gap-4";
+      case "2x4_vertical_large":
+        return "grid grid-cols-2 gap-4";
+      case "1x3_horizontal_small":
+        return "flex flex-col";
+      default:
+        return "flex flex-col";
+    }
+  };
+
   const handleNext = () => {
+    setSelectedImg(selectedImages);
     setCurrentStep(4);
     navigate("/filter-image");
   };
@@ -35,11 +111,9 @@ export const ListImage: React.FC = () => {
   ];
 
   const [imageUrls, setImageUrls] = useState<string[]>(
-    initialFromState &&
-      Array.isArray(initialFromState) &&
-      initialFromState.length > 0
-      ? initialFromState
-      : defaultImages,
+    thumbnails && Array.isArray(thumbnails) && thumbnails.length > 0
+      ? thumbnails
+      : defaultImages
   );
 
   useEffect(() => {
@@ -54,7 +128,6 @@ export const ListImage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
-  const maxSelected = 4;
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   // Click ảnh bên trái để chọn ảnh (nếu chưa chọn maxSelected)
@@ -79,7 +152,9 @@ export const ListImage: React.FC = () => {
           {imageUrls.map((url, idx) => (
             <div
               key={idx}
-              className={`w-52 h-36 border flex items-center justify-center cursor-pointer ${isSelected(url) ? "bg-gray-300" : "bg-center bg-no-repeat"}`}
+              className={`w-52 h-36 border flex items-center justify-center cursor-pointer ${
+                isSelected(url) ? "bg-gray-300" : "bg-center bg-no-repeat"
+              }`}
               style={
                 isSelected(url)
                   ? {}
@@ -88,7 +163,7 @@ export const ListImage: React.FC = () => {
                       backgroundSize: "auto 100%",
                     }
               }
-              onClick={() => !isSelected(url) && handleLeftClick(url)}
+              onClick={() => handleLeftClick(url)}
             >
               {isSelected(url) && (
                 <span className="text-gray-600 italic"></span>
@@ -103,15 +178,22 @@ export const ListImage: React.FC = () => {
             </p>
           </div>
         </div>
-
         {/* Bên phải - khung preview 4 ô */}
-        <div className="border-2 border-black bg-black p-4 flex flex-col gap-4">
+        <div
+          className={clsx(
+            "border-2 border-[#64646464] bg-white p-4 gap-4",
+            styleFrameBody()
+          )}
+        >
           {[...Array(maxSelected)].map((_, idx) => {
             const url = selectedImages[idx];
             return (
               <div
                 key={idx}
-                className="w-[165px] h-[102px] bg-pink-50 bg-center bg-no-repeat border cursor-pointer flex items-center justify-center hover:opacity-80"
+                className={clsx(
+                  "bg-pink-50 bg-center bg-no-repeat border cursor-pointer flex items-center justify-center hover:opacity-80",
+                  styleFrame()
+                )}
                 style={
                   url
                     ? {
@@ -127,12 +209,10 @@ export const ListImage: React.FC = () => {
             );
           })}
         </div>
-
         {/* Left / Right arrows (same style as other screens) */}
         {/* <button aria-label="Prev" onClick={handleBack} className={styles.navButtonLeft}>
                     <ChevronLeft className="w-5 h-5" />
                 </button> */}
-
         <button
           aria-label="Next"
           onClick={handleNext}

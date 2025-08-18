@@ -11,6 +11,7 @@ export const LoadingScreen: React.FC = () => {
   useEffect(() => {
     // Redirect after 10 seconds
     const timer = setTimeout(() => {
+      useAppStore.getState().setPaymentStatus("success");
       setCurrentStep(5);
       navigate("/capture");
     }, 10000);

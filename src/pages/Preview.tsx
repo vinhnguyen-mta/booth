@@ -50,7 +50,7 @@ export const Preview: React.FC = () => {
             img.onload = () => resolve(img);
             img.src = src;
           });
-        }),
+        })
       );
 
       const videoBlob = await videoGenerator.createSlideshow(images, {
@@ -81,10 +81,17 @@ export const Preview: React.FC = () => {
     return new Intl.NumberFormat("vi-VN").format(price);
   };
 
-  if (!finalImage) {
-    navigate("/filters");
-    return null;
-  }
+  React.useEffect(() => {
+    if (capturedImages.length > 0 && !generatedVideo && !isGeneratingVideo) {
+      generateVideo();
+    }
+  }, [capturedImages, generatedVideo, isGeneratingVideo]);
+
+  React.useEffect(() => {
+    if (!finalImage) {
+      navigate("/list-image");
+    }
+  }, [finalImage, navigate]);
 
   return (
     <Layout>

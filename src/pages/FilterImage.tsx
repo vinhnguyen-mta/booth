@@ -6,6 +6,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import styles from "./Css.module.css";
+import { FilterSelectorIcons } from "../components/FilterSelectorIcons.tsx";
+import { ListImageSelected } from "./ListImageSelected.tsx";
+import { FilterSelectorFrame } from "../components/FilterSelectorIconsFrame.tsx";
 
 export const FilterImage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +19,11 @@ export const FilterImage: React.FC = () => {
     selectedFilter,
     setSelectedFilter,
     setCurrentStep,
+    icons,
+    setIcons,
+    frames,
+    setFrame,
+    selectedImg
   } = useAppStore();
   const [fillMode, setFillMode] = useState(false);
 
@@ -27,7 +35,7 @@ export const FilterImage: React.FC = () => {
   const handleNext = () => {
     useAppStore.getState().setPaymentStatus("success");
     setCurrentStep(4);
-    navigate("/export-image", { state: { fillMode, capturedImages } });
+    navigate("/export-image", { state: { fillMode, selectedImg } });
   };
 
   if (!selectedFrame || capturedImages.length === 0) return null;
@@ -39,7 +47,7 @@ export const FilterImage: React.FC = () => {
           className="flex items-center justify-center bg-white"
           style={{ gap: "12rem" }}
         >
-          <ImageCanvas selectedImages={capturedImages} fillMode={fillMode} />
+          <ImageCanvas selectedImages={selectedImg} fillMode={fillMode} />
 
           {/* Nội dung bên phải */}
           <div className="flex flex-col gap-8">
@@ -59,7 +67,7 @@ export const FilterImage: React.FC = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-normal mb-4">Chỉnh Sửa Ảnh</h2>
+              <h2 className="text-lg font-normal mb-4">Khung ảnh Onibooth</h2>
               <FilterSelector
                 selectedFilter={selectedFilter}
                 onFilterSelect={setSelectedFilter}
@@ -68,41 +76,21 @@ export const FilterImage: React.FC = () => {
 
             {/* Khung cơ bản */}
             <div>
-              <h2 className="text-lg font-normal mb-4">Khung cơ bản</h2>
-              <div className="flex gap-4 justify-center">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="w-20 h-20 bg-black" />
-                ))}
-              </div>
+              <h2 className="text-lg font-normal mb-4">Icons</h2>
+              <FilterSelectorIcons
+                selectedFilter={icons}
+                onFilterSelect={setIcons}
+              />
             </div>
 
             {/* Khung ảnh Onibooth */}
             <div>
               <h2 className="text-lg font-normal mb-4">Khung ảnh Onibooth</h2>
-              <div className="flex items-center gap-3">
-                <button className="w-9 h-9 border border-black rounded-full flex items-center justify-center">
-                  &lt;
-                </button>
-                <div className="flex gap-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="w-20 h-20 bg-black" />
-                  ))}
-                </div>
-                <button className="w-9 h-9 border border-black rounded-full flex items-center justify-center">
-                  &gt;
-                </button>
-              </div>
-              {/* Pagination */}
-              <div className="flex gap-2 mt-4 justify-center">
-                {[1, 2, 3, 4].map((num) => (
-                  <div
-                    key={num}
-                    className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs"
-                  >
-                    {num}
-                  </div>
-                ))}
-              </div>
+              <FilterSelectorFrame
+                selectedFilter={frames}
+                onFilterSelect={setFrame}
+                selectedFrame={selectedFrame}
+              />
             </div>
           </div>
         </div>

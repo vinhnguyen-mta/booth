@@ -1,20 +1,20 @@
 // UPDATE: New reusable FilterSelector component
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Filter, getFilters, getIcons } from "../services/api";
+import { Filter, getFilters, getIcons, Icons } from "../services/api";
 
 interface FilterSelectorProps {
-  selectedFilter: string | null;
-  onFilterSelect: (filterId: string| null) => void;
+  selectedFilter: string;
+  onFilterSelect: (filterId: string) => void | null;
   language: "en" | "vi";
 }
 
-export const  FilterSelector: React.FC<FilterSelectorProps> = ({
+export const  FilterSelectorIcons: React.FC<FilterSelectorProps> = ({
   selectedFilter,
   onFilterSelect,
   language,
 }) => {
-  const [filters, setFilters] = useState<Filter[]>([]);
+  const [filters, setFilters] = useState<Icons[]>([]);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0); // thay cho page
 
@@ -23,8 +23,8 @@ export const  FilterSelector: React.FC<FilterSelectorProps> = ({
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const filtersData = await getFilters();
-        console.log("filtersData", filtersData);
+        const filtersData = await getIcons();
+        console.log("filtersDataIcons", filtersData);
         setFilters(filtersData);
       } catch (error) {
         console.error("Error loading filters:", error);
@@ -91,7 +91,7 @@ export const  FilterSelector: React.FC<FilterSelectorProps> = ({
       {/* Filters */}
       <div className="flex gap-4">
         {currentFilters.map((filter, index) => (
-          <div key={index} className="flex flex-col items-center">
+          <div key={filter.id} className="flex flex-col items-center">
             <motion.button
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -107,11 +107,10 @@ export const  FilterSelector: React.FC<FilterSelectorProps> = ({
               <div className="w-16 h-16 rounded-lg overflow-hidden relative">
                 <div
                   className="absolute inset-0 bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200"
-                  style={{ filter: filter.preview_filter || filter.css_filter }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center">
-                    <span className="text-lg">{filter.icon}</span>
+                    <span className="text-lg">{filter.file_path}</span>
                   </div>
                 </div>
               </div>
@@ -120,7 +119,7 @@ export const  FilterSelector: React.FC<FilterSelectorProps> = ({
             {/* Label */}
             <span className="mt-1 text-sm">
               {" "}
-              {language === "vi" ? filter.name_vi : filter.name}
+              {filter.name ? filter.name : ""}
             </span>
           </div>
         ))}
