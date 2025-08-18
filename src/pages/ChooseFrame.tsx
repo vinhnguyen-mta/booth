@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
@@ -17,6 +17,10 @@ export const ChooseFrame: React.FC = () => {
     setCurrentStep(0);
     navigate("/");
   };
+
+  useEffect(()=>{
+      setSelectedFrame(null);
+  }, [])
 
   const handleContinue = () => {
     if (selectedFrame) {

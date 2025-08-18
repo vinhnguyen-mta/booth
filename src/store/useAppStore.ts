@@ -30,7 +30,7 @@ interface AppStore extends AppState {
   isFullscreen: boolean;
   setFullscreen: (isFullscreen: boolean) => void;
   setIcons: (icon: string) => void;
-  setFrame: (frame: string) => void;
+  setFrame: (frame: string | null) => void;
   setSelectedImg: (img: any)=> void;
 }
 

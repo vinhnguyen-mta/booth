@@ -17,9 +17,16 @@ export default {
         "bounce-slow": "bounce 2s infinite",
         "pulse-slow": "pulse 3s infinite",
         "scale-102": "scale 0.2s ease-in-out",
+        flash: "flash 0.3s ease-in-out",
       },
       scale: {
         102: "1.02",
+      },
+      keyframes: {
+        flash: {
+          "0%, 100%": { transform: "scale(1)", opacity: "1" },
+          "50%": { transform: "scale(1.2)", opacity: "0.5" },
+        },
       },
     },
   },

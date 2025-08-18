@@ -600,7 +600,9 @@ export const Capture: React.FC = () => {
               >
                 {capturedCount <= totalShots && (
                   <div
-                    className="w-56 h-56 border-4 border-[#0b3a8a] rounded-full flex items-center justify-center text-[#0b3a8a] text-8xl font-bold"
+                    className={`w-56 h-56 border-4 border-[#0b3a8a] rounded-full flex items-center justify-center text-[#0b3a8a] text-8xl font-bold ${
+                      count === 1 ? "animate-flash" : ""
+                    }`}
                     style={{
                       position: "absolute",
                       right: 0,

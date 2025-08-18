@@ -267,3 +267,13 @@
   margin: 4px;
   background-image: url("/assets/image4.webp"); background-size: auto 100%;
 }
+
+
+@keyframes flash {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+}
+
+.flash {
+  animation: flash 0.3s ease-in-out;
+}

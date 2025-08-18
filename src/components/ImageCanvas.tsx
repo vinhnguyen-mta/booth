@@ -32,7 +32,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
     if (selectedFrame && selectedImages?.length > 0) {
       renderCanvas();
     }
-  }, [selectedImages, selectedFilter, fillMode, selectedFrame]);
+  }, [selectedImages, selectedFilter, fillMode, selectedFrame, frames]);
 
   const listResizeHeight = [
     "1x3_horizontal_small",
@@ -70,13 +70,25 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
     // reset filter for frame
     ctx.filter = "none";
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-    setFinalImage(dataUrl);
+    // load frame PNG
+    const frame = await new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = frames?.image;
+      img.onload = () => resolve(img);
+      img.onerror = (err) => {
+        console.error("Failed to load frame PNG", err);
+        resolve(null);
+      };
+    });
 
-    await drawFrameOverlay(ctx, selectedFrame.svg);
+    await drawFrameOverlay(ctx, selectedFrame.svg, frame);
 
     // callback + store
     if (onImageProcessed) onImageProcessed(canvas);
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    setFinalImage(dataUrl);
   };
 
   return (
@@ -123,13 +135,13 @@ async function drawImagesWithLayout(
   switch (layout) {
     case "1x1_vertical_large":
       if (loadedImages[0]) {
-        drawImageFit(ctx, loadedImages[0], 40, 120, 800, 600, "stretch");
+        drawImageFit(ctx, loadedImages[0], 40, 120, 720, 600, "stretch");
       }
       break;
     case "1x2_vertical_large":
       loadedImages.slice(0, 2).forEach((img, index) => {
-        const y = 140 + index * (250 + 40);
-        drawImageFit(ctx, img, 40, y, 700, 250, "stretch");
+        const y = 140 + index * (250 + 80);
+        drawImageFit(ctx, img, 40, y, 720, 260, "stretch");
       });
       break;
     case "2x2_vertical_large":
@@ -137,14 +149,14 @@ async function drawImagesWithLayout(
         const col = index % 2;
         const row = Math.floor(index / 2);
         const x = 72 + col * 350;
-        const y = 100 + row * 350;
+        const y = 110 + row * (310 + 20);
         drawImageFit(ctx, img, x, y, 300, 300, "stretch");
       });
       break;
     case "1x4_vertical_small":
       loadedImages.slice(0, 4).forEach((img, index) => {
-        const y = 40 + index * (250 + 40);
-        drawImageFit(ctx, img, 60, y, 680, 250, "stretch");
+        const y = 165 + index * (220 + 24);
+        drawImageFit(ctx, img, 60, y, 680, 210, "stretch");
       });
 
       break;
@@ -153,32 +165,32 @@ async function drawImagesWithLayout(
         const col = index % 2;
         const row = Math.floor(index / 2);
         const x = 40 + col * 380;
-        const y = 180 + row * 280;
+        const y = 180 + row * (280+ 40);
         drawImageFit(ctx, img, x, y, 340, 200, "stretch");
       });
       break;
     case "2x3_vertical_large":
       const imgWidth = 350;
-      const imgHeight = 260;
+      const imgHeight = 320;
 
       loadedImages.slice(0, 6).forEach((img, index) => {
         const col = index % 2;
         const row = Math.floor(index / 2);
         const x = 44 + col * (imgWidth + spacingX);
-        const y = 200 + row * (imgHeight + spacingY);
+        const y = 120 + row * (imgHeight + spacingY);
         drawImageFit(ctx, img, x, y, imgWidth, imgHeight, "stretch");
       });
       break;
     case "2x4_vertical_large":
       const imgWidth2X4 = 350;
-      const imgHeight2X4 = 250;
+      const imgHeight2X4 = 248;
 
       loadedImages.slice(0, 8).forEach((img, index) => {
         const col = index % 2;
         const row = Math.floor(index / 2);
 
         const x = 40 + col * (imgWidth2X4 + spacingX);
-        const y = 100 + row * (imgHeight2X4 + spacingY);
+        const y = 100 + row * (imgHeight2X4 + 12);
 
         drawImageFit(ctx, img, x, y, imgWidth2X4, imgHeight2X4, "stretch");
       });
@@ -246,17 +258,46 @@ function drawImageFit(
   ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 }
 
-async function drawFrameOverlay(ctx: CanvasRenderingContext2D, svg: string) {
+async function drawFrameOverlay(
+  ctx: CanvasRenderingContext2D,
+  svg: string,
+  frame?: any
+) {
+
   const blob = new Blob([svg], { type: "image/svg+xml" });
   const url = URL.createObjectURL(blob);
 
-  return new Promise<void>((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  // tạo image cho SVG
+  const svgImg = new Image();
+  svgImg.src = url;
+
+  await new Promise<void>((resolve) => {
+    svgImg.onload = () => {
+      ctx.drawImage(svgImg, 0, 0, ctx.canvas.width, ctx.canvas.height);
       URL.revokeObjectURL(url);
       resolve();
     };
-    img.src = url;
+    svgImg.onerror = (err) => {
+      console.error("Failed to load SVG", err);
+      URL.revokeObjectURL(url);
+      resolve();
+    };
   });
+
+  if (frame) {
+    if (frame.complete) {
+      ctx.drawImage(frame, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    } else {
+      await new Promise<void>((resolve) => {
+        frame.onload = () => {
+          ctx.drawImage(frame, 0, 0, ctx.canvas.width, ctx.canvas.height);
+          resolve();
+        };
+        frame.onerror = () => {
+          console.error("Failed to draw frame PNG");
+          resolve();
+        };
+      });
+    }
+  }
 }

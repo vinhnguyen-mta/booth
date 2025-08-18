@@ -55,9 +55,9 @@ export const FilterImage: React.FC = () => {
             <div className="flex items-center justify-between w-full px-4 mb-5">
               <div style={{ width: "64px" }} />
               {/* placeholder để cân giữa */}
-              <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
+              {/* <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
                 56
-              </div>
+              </div> */}
               <button
                 onClick={handleNext}
                 className="px-4 py-2 bg-[#1f3a93] text-white rounded-full hover:opacity-90 transition"
@@ -67,7 +67,7 @@ export const FilterImage: React.FC = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-normal mb-4">Khung ảnh Onibooth</h2>
+              <h2 className="text-lg font-normal mb-4">Chỉnh sửa ảnh</h2>
               <FilterSelector
                 selectedFilter={selectedFilter}
                 onFilterSelect={setSelectedFilter}
@@ -75,13 +75,13 @@ export const FilterImage: React.FC = () => {
             </div>
 
             {/* Khung cơ bản */}
-            <div>
+            {/* <div>
               <h2 className="text-lg font-normal mb-4">Icons</h2>
               <FilterSelectorIcons
                 selectedFilter={icons}
                 onFilterSelect={setIcons}
               />
-            </div>
+            </div> */}
 
             {/* Khung ảnh Onibooth */}
             <div>

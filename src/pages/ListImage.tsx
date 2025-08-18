@@ -174,7 +174,7 @@ export const ListImage: React.FC = () => {
           <div className="w-52 h-36 bg-neutral-900 text-white flex flex-col items-center justify-center">
             <p className="text-sm font-semibold">Vui lòng chọn ảnh</p>
             <p className="text-3xl font-bold mt-1">
-              {selectedImages.length}/{imageUrls.length}
+              {selectedImages.length}/{maxSelected}
             </p>
           </div>
         </div>
@@ -213,13 +213,15 @@ export const ListImage: React.FC = () => {
         {/* <button aria-label="Prev" onClick={handleBack} className={styles.navButtonLeft}>
                     <ChevronLeft className="w-5 h-5" />
                 </button> */}
-        <button
-          aria-label="Next"
-          onClick={handleNext}
-          className={styles.navButtonRight}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
+        {selectedImages.length === maxSelected && (
+          <button
+            aria-label="Next"
+            onClick={handleNext}
+            className={styles.navButtonRight}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </Layout>
   );

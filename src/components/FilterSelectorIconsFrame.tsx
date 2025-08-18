@@ -10,7 +10,7 @@ import {
 } from "../services/api";
 
 interface FilterSelectorProps {
-  selectedFilter: string;
+  selectedFilter: string | any;
   onFilterSelect: (filterId: string) => void | null;
   language: "en" | "vi";
   selectedFrame: any;
@@ -34,7 +34,6 @@ export const FilterSelectorFrame: React.FC<FilterSelectorProps> = ({
         console.log("selectedFrame.code", selectedFrame);
 
         const filtersData = await getFiltersFrame(selectedFrame.code);
-        console.log("filtersDataIcons", filtersData);
         setFilters(filtersData);
       } catch (error) {
         console.error("Error loading filters:", error);
@@ -106,9 +105,9 @@ export const FilterSelectorFrame: React.FC<FilterSelectorProps> = ({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onFilterSelect(filter.id)}
+              onClick={() => onFilterSelect(filter)}
               className={`flex items-center justify-center w-20 h-20 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
-                selectedFilter === filter.id
+                selectedFilter?.id === filter.id
                   ? "border-primary bg-primary/10 text-primary shadow-lg ring-2 ring-primary/20"
                   : "border-gray-200 hover:border-primary/30 text-gray-700 hover:shadow-md"
               }`}
@@ -118,7 +117,11 @@ export const FilterSelectorFrame: React.FC<FilterSelectorProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center">
-                    <span className="text-lg">{filter.image}</span>
+                      <img
+                        src={filter.image}
+                        alt="reset"
+                        className="w-16 h-16 object-contain"
+                      />
                   </div>
                 </div>
               </div>

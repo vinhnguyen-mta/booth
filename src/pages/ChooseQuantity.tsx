@@ -54,6 +54,11 @@ export const ChooseQuantity: React.FC = () => {
     <Layout>
       <div className="step-content min-h-screen flex items-center relative">
         {/* Top centered banner */}
+        {/* <div className="w-full absolute top-8 right-10 flex justify-end z-20">
+          <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
+            56
+          </div>
+        </div> */}
         <div className="w-full absolute top-8 left-0 flex justify-center z-20">
           <div className="bg-[#00167a] text-white rounded-b-xl px-6 py-2 font-bold text-lg text-center max-w-[520px]">
             Vui lòng chọn số lượng ảnh in
@@ -86,9 +91,7 @@ export const ChooseQuantity: React.FC = () => {
               className="bg-white rounded-2xl p-8 flex items-center justify-center"
               style={{ width: "100%" }}
             >
-              <div
-                className="w-56 md:w-64 lg:w-72 h-[320px] lg:h-[420px] flex items-center justify-center"
-              >
+              <div className="w-56 md:w-64 lg:w-72 h-[320px] lg:h-[420px] flex items-center justify-center">
                 <img src={selectedFrame.image} alt="preview" />
               </div>
             </motion.div>
