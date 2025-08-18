@@ -31,6 +31,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
   const loadFrames = async () => {
     try {
       const framesData = await getFrames();
+      console.log("Loaded frames:", framesData);
       setFrames(framesData);
     } catch (error) {
       console.error("Error loading frames:", error);
@@ -83,14 +84,13 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
               onClick={() => onFrameSelect(frame)}
             >
               <div className={styles.titleBadge}>
-                <span>{language === "vi" ? frame.name_vi : frame.name}</span>
+                <span>{language === "vi" ? frame.name : "Ảnh"}</span>
               </div>
 
               <div className={styles.previewWrap}>
-                <div
-                  className={styles.frameStroke}
-                  dangerouslySetInnerHTML={{ __html: frame.svg }}
-                />
+                <div className={styles.frameStroke}>
+                  <img src={frame.image} alt="preview" />
+                </div>
               </div>
 
               <div className={styles.footer}>

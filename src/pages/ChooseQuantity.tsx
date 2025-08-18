@@ -88,8 +88,9 @@ export const ChooseQuantity: React.FC = () => {
             >
               <div
                 className="w-56 md:w-64 lg:w-72 h-[320px] lg:h-[420px] flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: selectedFrame.svg }}
-              />
+              >
+                <img src={selectedFrame.image} alt="preview" />
+              </div>
             </motion.div>
 
             {/* Quantity controls & price (centered like image) */}

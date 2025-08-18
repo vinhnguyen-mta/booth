@@ -10,6 +10,7 @@ export interface AppConfig {
 }
 
 export interface Frame {
+  image: string;
   id: string;
   name: string;
   name_vi: string;
@@ -103,9 +104,9 @@ export async function getAppConfig(): Promise<AppConfig> {
 // TODO: Replace with real API call
 export async function getFrames(): Promise<Frame[]> {
   try {
-    const response = await fetch("/data/frames.json");
+    const response = await fetch(import.meta.env.VITE_API_URL + "layouts");
     const data = await response.json();
-    return data.frames;
+    return data.data;
   } catch (error) {
     console.error("Error loading frames:", error);
     return [];

@@ -70,8 +70,8 @@ export const Payment: React.FC = () => {
 
   const handleCashPayment = () => {
     setPaymentMethod("cash");
-    // setCurrentStep(3);
-    // navigate('/total-payment');
+    setCurrentStep(3);
+    navigate('/total-payment');
     setShowCashModal(true);
   };
 

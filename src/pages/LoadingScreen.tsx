@@ -11,8 +11,8 @@ export const LoadingScreen: React.FC = () => {
   useEffect(() => {
     // Redirect after 10 seconds
     const timer = setTimeout(() => {
-      setCurrentStep(6);
-      navigate("/wait-capture"); // or your next route
+      setCurrentStep(5);
+      navigate("/capture");
     }, 10000);
 
     return () => clearTimeout(timer);

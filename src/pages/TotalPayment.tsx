@@ -21,6 +21,7 @@ export const TotalPayment: React.FC = () => {
   };
 
   const handleDotClick = () => {
+    setCurrentStep(4);
     navigate("/loading");
   };
 
@@ -73,6 +74,7 @@ export const TotalPayment: React.FC = () => {
           <div className={styles.col}>
             <div className={styles.colTitle}>SỐ TIỀN ĐÃ NHẬN ĐƯỢC</div>
             <div className={styles.colTitle2}>AMOUNT RECEIVED</div>
+            <div className={styles.amount}>{formatPrice(totalPrice)} VND</div>
             <div className={styles.colSub} />
           </div>
 
@@ -83,11 +85,11 @@ export const TotalPayment: React.FC = () => {
               </div>
             </div>
 
-            <div
-              className={styles.centerDot}
-              onClick={handleDotClick}
-              style={{ cursor: "pointer" }}
-            />
+            <div style={{ cursor: "pointer", display: "flex", gap: "6px" }} onClick={handleDotClick}>
+              <div className={styles.centerDot}></div>
+              <div className={`${styles.centerDot} ${styles.dot2}`}></div>
+              <div className={`${styles.centerDot} ${styles.dot3}`}></div>
+            </div>
           </div>
 
           <div className={styles.col}>
