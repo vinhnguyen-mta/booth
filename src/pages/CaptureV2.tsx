@@ -4,6 +4,8 @@ import { Layout } from "../components/Layout";
 import { useAppStore } from "../store/useAppStore";
 import styles from "./CaptureV2.module.css";
 import { Camera, RefreshCw, Pause, ArrowRight } from "lucide-react";
+import { CountdownBadge } from "../components/CountdownBadge";
+import { TEXT_IMG_SIZE } from "../constant/constant";
 
 export const CaptureV2: React.FC = () => {
   const navigate = useNavigate();
@@ -60,8 +62,16 @@ export const CaptureV2: React.FC = () => {
     let mounted = true;
     const start = async () => {
       try {
+        const TARGET_AR = 9 / 16;
+        const TARGET_W = 1080;
+        const TARGET_H = 1920;
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
+          video: {
+            facingMode: "user",
+            width: { ideal: TARGET_W },
+            height: { ideal: TARGET_H },
+            aspectRatio: { ideal: TARGET_AR },
+          },
           audio: false,
         });
         if (!mounted) {
@@ -228,6 +238,58 @@ export const CaptureV2: React.FC = () => {
       }, 500);
     });
   }, []);
+
+  function scale(value: number) {
+    return (value / 100) * 6;
+  }
+
+  const getImgSize = () => {
+    let width = 0;
+    let height = 0;
+
+    switch (selectedFrame?.code) {
+      case TEXT_IMG_SIZE.IMG_1X1:
+        width = scale(2128);
+        height = scale(2897);
+        break;
+      case TEXT_IMG_SIZE.IMG_1X2_VERTICAL:
+        width = scale(2140);
+        height = scale(1393);
+        break;
+      case TEXT_IMG_SIZE.IMG_2X2_VERTICAL:
+        width = scale(1048);
+        height = scale(1419);
+        break;
+      case TEXT_IMG_SIZE.IMG_1X4_VERTICAL:
+        width = scale(1045);
+        height = scale(671);
+        break;
+      case TEXT_IMG_SIZE.IMG_1X4_HORIZONTAL:
+        width = scale(1637);
+        height = scale(900);
+        break;
+      case TEXT_IMG_SIZE.IMG_2X3_VERTICAL:
+        width = scale(1062);
+        height = scale(2963 / 3);
+        break;
+      case TEXT_IMG_SIZE.IMG_2X4_VERTICAL:
+        width = scale(1058);
+        height = scale(738);
+        break;
+      case TEXT_IMG_SIZE.IMG_1X3_HORIZONTAL:
+        width = scale(1095);
+        height = scale(821);
+        break;
+      default:
+        width = scale(2128);
+        height = scale(2897);
+        break;
+    }
+    return {
+      width,
+      height,
+    };
+  };
 
   // Improved captureShot with video recording
   const captureShot = useCallback(async () => {
@@ -556,7 +618,6 @@ export const CaptureV2: React.FC = () => {
       <div className={styles.page}>
         <main className={styles.main}>
           <div className={styles.previewWrap} style={{ position: "relative" }}>
-            {/* container: frame on left (smaller), gif/video list on the right (scrollable, max 8) */}
             <div
               style={{
                 display: "flex",
@@ -568,16 +629,32 @@ export const CaptureV2: React.FC = () => {
               {/* Frame area - reduced size */}
               <div
                 style={{
+                  position: "absolute",
+                  left: 0,
                   display: "grid",
                   gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "10px",
-                  maxHeight: "100px",
-                  paddingRight: "20px",
-                  minWidth: "280px",
+                  gap: 10,
+                  paddingRight: 20,
+                  placeContent: "start",
+                  alignItems: "start",
+                  alignSelf: "flex-start",
+                  paddingTop: `calc((100vh - min(90vh, calc(80vw * ${
+                    getImgSize().width
+                  }/${getImgSize().height}))) / 2)`,
+                  paddingLeft:
+                    selectedFrame?.code === "1x2_vertical_large" ? 0 : 110,
                 }}
+                className={styles.thumbColumn}
               >
                 {capturedImages.map((src: string, idx: number) => (
-                  <div key={idx} className={styles.thumbItem}>
+                  <div
+                    key={idx}
+                    className={styles.thumbItem}
+                    style={{
+                      width: getImgSize().width + "px",
+                      height: getImgSize().height + "px",
+                    }}
+                  >
                     <img
                       src={src}
                       alt={`capture-${idx}`}
@@ -586,362 +663,48 @@ export const CaptureV2: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div
-                className={styles.frameArea}
-                style={{
-                  width: "100%",
-                  height: "100vh",
-                  maxWidth: "80vw",
-                  maxHeight: "98vh",
-                  position: "relative",
-                  boxSizing: "border-box",
-                }}
-              >
-                {capturedCount <= totalShots && (
-                  <div
-                    className={`w-56 h-56 border-4 border-[#0b3a8a] rounded-full flex items-center justify-center text-[#0b3a8a] text-8xl font-bold ${
-                      count === 1 ? "animate-flash" : ""
-                    }`}
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      margin: "auto",
-                    }}
-                  >
-                    {count}
-                  </div>
-                )}
-
-                <video
-                  ref={videoRef}
-                  className={styles.video}
-                  playsInline
-                  muted
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-                {selectedFrame && (
-                  <div className={styles.frameOverlay} aria-hidden />
-                )}
-                {cycleCountdown > 0 && (
-                  <div className={styles.overlayCountdown}>
-                    <div className={styles.overlayNumber}>{cycleCountdown}</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Right sidebar: GIF / video clips (max 8), scrollable */}
-              {/* <aside
-                aria-label="gif-list"
-                style={{
-                  width: 160,
-                  maxHeight: 280,
-                  overflowY: "auto",
-                  padding: 8,
-                  background: "rgba(255,255,255,0.98)",
-                  borderRadius: 8,
-                  boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
-                  flexShrink: 0,
-                }}
-              >
+              <div className={styles.stage}>
                 <div
+                  className={styles.frameArea}
                   style={{
-                    fontSize: 13,
-                    color: "#374151",
-                    marginBottom: 8,
-                    textAlign: "center",
+                    height: `min(90vh, 80vw * ${getImgSize().width} / ${
+                      getImgSize().height
+                    })`,
+                    width: "auto",
+                    aspectRatio: `${getImgSize().width}/${getImgSize().height}`,
+                    position: "relative",
+                    boxSizing: "border-box",
+                    overflow: "hidden",
                   }}
                 >
-                  {language === "vi" ? "GIF/Video" : "GIFs / Video"}
-                </div>
-
-                {capturedVideos.length === 0 && gifs.length === 0 && (
-                  <div
-                    style={{
-                      color: "#6b7280",
-                      fontSize: 12,
-                      textAlign: "center",
-                      padding: "12px 4px",
-                    }}
-                  >
-                    {language === "vi" ? "Chưa có clip" : "No clips yet"}
-                  </div>
-                )}
-
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                >
-                  {gifs.slice(0, 8).map((gif, idx) =>
-                    gif ? (
-                      <div
-                        key={`gif-${idx}`}
-                        style={{
-                          width: "100%",
-                          height: 80,
-                          borderRadius: 6,
-                          overflow: "hidden",
-                          position: "relative",
-                          border: "1px solid #e5e7eb",
-                        }}
-                      >
-                        <img
-                          src={gif}
-                          alt={`gif-${idx}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            right: 6,
-                            bottom: 6,
-                            display: "flex",
-                            gap: 6,
-                          }}
-                        >
-                          <button
-                            onClick={() =>
-                              downloadVideo(
-                                capturedVideos[idx] || "",
-                                idx,
-                                false
-                              )
-                            }
-                            title="Download WebM"
-                            style={{
-                              background: "rgba(0,0,0,0.6)",
-                              color: "#fff",
-                              border: "none",
-                              padding: "4px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              cursor: "pointer",
-                            }}
-                          >
-                            WebM
-                          </button>
-                          <button
-                            onClick={() =>
-                              downloadVideo(
-                                capturedVideos[idx] || "",
-                                idx,
-                                true
-                              )
-                            }
-                            title="Download GIF"
-                            style={{
-                              background: "rgba(0,0,0,0.6)",
-                              color: "#fff",
-                              border: "none",
-                              padding: "4px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              cursor: "pointer",
-                            }}
-                          >
-                            GIF
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        key={`gif-${idx}`}
-                        style={{
-                          width: "100%",
-                          height: 80,
-                          borderRadius: 6,
-                          background: "#f3f4f6",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#9ca3af",
-                        }}
-                      >
-                        {language === "vi" ? "Đang xử lý..." : "Processing..."}
-                      </div>
-                    )
+                  {capturedCount <= totalShots && (
+                    <CountdownBadge count={count} color="#0b3a8a" />
                   )}
-
-                  {capturedVideos
-                    .slice(0, 8 - gifs.length)
-                    .map((videoUrl, idx) => (
-                      <div
-                        key={`v-${idx}`}
-                        style={{
-                          width: "100%",
-                          height: 80,
-                          borderRadius: 6,
-                          overflow: "hidden",
-                          position: "relative",
-                          border: "1px solid #e5e7eb",
-                        }}
-                      >
-                        <video
-                          src={videoUrl}
-                          muted
-                          loop
-                          autoPlay
-                          playsInline
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            right: 6,
-                            bottom: 6,
-                            display: "flex",
-                            gap: 6,
-                          }}
-                        >
-                          <button
-                            onClick={() => downloadVideo(videoUrl, idx, false)}
-                            title="Download WebM"
-                            style={{
-                              background: "rgba(0,0,0,0.6)",
-                              color: "#fff",
-                              border: "none",
-                              padding: "4px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              cursor: "pointer",
-                            }}
-                          >
-                            WebM
-                          </button>
-                          <button
-                            onClick={() => downloadVideo(videoUrl, idx, true)}
-                            title="Download GIF"
-                            style={{
-                              background: "rgba(0,0,0,0.6)",
-                              color: "#fff",
-                              border: "none",
-                              padding: "4px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              cursor: "pointer",
-                            }}
-                          >
-                            GIF
-                          </button>
-                        </div>
+                  <video
+                    ref={videoRef}
+                    className={styles.video}
+                    playsInline
+                    muted
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                  {selectedFrame && (
+                    <div className={styles.frameOverlay} aria-hidden />
+                  )}
+                  {cycleCountdown > 0 && (
+                    <div className={styles.overlayCountdown}>
+                      <div className={styles.overlayNumber}>
+                        {cycleCountdown}
                       </div>
-                    ))}
+                    </div>
+                  )}
                 </div>
-              </aside> */}
-            </div>
-
-            {/* action row and thumbs stay below frame+sidebar */}
-            <div className={styles.actionRow} style={{ marginTop: 12 }}>
-              <button
-                className={styles.iconBtn}
-                onClick={handleReset}
-                title={language === "vi" ? "Reset ảnh" : "Reset"}
-              >
-                <RefreshCw />
-              </button>
-
-              <button
-                className={styles.captureBtn}
-                onClick={handleSingleCapture}
-                disabled={
-                  isCapturingPhoto || capturedImages.length >= requiredPhotos
-                }
-                title={language === "vi" ? "Chụp 1 ảnh" : "Capture"}
-              >
-                <Camera />
-              </button>
-
-              <button
-                className={`${styles.iconBtn} ${
-                  isContinuous ? styles.active : ""
-                }`}
-                onClick={() =>
-                  isContinuous ? stopContinuous() : startContinuous()
-                }
-                disabled={capturedImages.length >= requiredPhotos}
-                title={
-                  language === "vi"
-                    ? "Chụp liên tiếp (1 ảnh sau 3s)"
-                    : "Continuous (1 shot after 3s)"
-                }
-                aria-label="continuous-capture"
-              >
-                {!isContinuous ? (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 32 32"
-                    fill="#fff"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g transform="translate(-108,-196)">
-                      <path d="m121.89453,202.00586c-0.92482,0-1.77586,0.52633-2.18945,1.35351l-0.32227,0.64649H117c-1.64501,0-3,1.35499-3,3v10c0,1.64501,1.35499,3,3,3h14c1.64501,0,3-1.35499,3-3v-10c0-1.64501-1.35499-3-3-3h-2.38281l-0.32227-0.64649c-0.41359-0.82718-1.26463-1.35351-2.18945-1.35351z" />
-                      <path d="m124,208.00586c-2.19729,0-4,1.80271-4,4 0,2.19729 1.80271,4 4,4 2.19729,0 4-1.80271 4-4 0-2.19729-1.80271-4-4-4z" />
-                    </g>
-                  </svg>
-                ) : (
-                  <Pause />
-                )}
-              </button>
-
-              <div className={styles.counter}>
-                {capturedImages.length} / {requiredPhotos}
-                {isContinuous && (
-                  <div style={{ fontSize: 12, marginTop: 4 }}>
-                    {countdown > 0 ? countdown : ""}
-                  </div>
-                )}
-              </div>
-
-              <label className={styles.filterLabel}>
-                <input
-                  type="checkbox"
-                  checked={smoothFilter}
-                  onChange={(e) => setSmoothFilter(e.target.checked)}
-                />
-                <span>{language === "vi" ? "Làm mịn da" : "Smooth skin"}</span>
-              </label>
-            </div>
-
-            <div
-              className={styles.thumbsWrap}
-              aria-label="Captured images"
-              style={{ marginTop: 12 }}
-            >
-              <div className={styles.thumbs}>
-                {capturedImages.length === 0 && (
-                  <div className={styles.emptyHint}>
-                    {language === "vi" ? "Chưa có ảnh" : "No photos yet"}
-                  </div>
-                )}
-                {capturedImages.map((src: string, idx: number) => (
-                  <div key={idx} className={styles.thumbItem}>
-                    <img
-                      src={src}
-                      alt={`capture-${idx}`}
-                      className={styles.thumbImg}
-                    />
-                  </div>
-                ))}
               </div>
             </div>
-
             {/* next arrow pinned to the right edge of the viewport */}
             {capturedImages.length >= requiredPhotos && (
               <button

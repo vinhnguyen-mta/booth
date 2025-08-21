@@ -1015,3 +1015,7 @@ canvas.high-quality {
     page-break-inside: avoid;
   }
 }
+
+@keyframes sweep {
+  to { stroke-dashoffset: 0; }
+}
