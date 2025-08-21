@@ -15,7 +15,7 @@ export interface AppState {
   totalPrice: number;
   icons: string;
   selectedImg: any | null;
-  frames: any
+  frames: any;
 }
 
 // UPDATE: Payment interfaces moved to services/api.ts

@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { useAppStore } from "../store/useAppStore";
-import styles from "./Capture1.module.css";
-import image1 from "../../public/assets/image1.webp";
+import styles from "./CaptureV2.module.css";
 import { Camera, RefreshCw, Pause, ArrowRight } from "lucide-react";
 
-export const Capture: React.FC = () => {
+export const CaptureV2: React.FC = () => {
   const navigate = useNavigate();
 
   const {
@@ -421,7 +420,7 @@ export const Capture: React.FC = () => {
       handleSingleCapture();
       // Sau khi đếm ngược xong, tăng số ảnh đã chụp và reset count
       setCapturedCount((prev) => prev + 1);
-      setCount(8);
+      setCount(1);
     }
   }, [count, capturedCount]);
 
@@ -969,4 +968,4 @@ export const Capture: React.FC = () => {
   );
 };
 
-export default Capture;
+export default CaptureV2;

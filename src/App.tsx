@@ -5,7 +5,7 @@ import { Landing } from "./pages/Landing";
 import { ChooseFrame } from "./pages/ChooseFrame";
 import { ChooseQuantity } from "./pages/ChooseQuantity";
 import { Payment } from "./pages/Payment";
-import { Capture } from "./pages/Capture1";
+import { CaptureV2 } from "./pages/CaptureV2";
 import { Filters } from "./pages/Filters";
 import { Preview } from "./pages/Preview";
 import { Password } from "./pages/Password";
@@ -15,7 +15,6 @@ import { FilterImage } from "./pages/FilterImage";
 import { ListImage } from "./pages/ListImage";
 import { WaitCapture } from "./pages/WaitCapture";
 import { End } from "./pages/End";
-import { Print } from "./pages/Print";
 import { Finish } from "./pages/Finish";
 import TotalPayment from "./pages/TotalPayment";
 import LoadingScreen from "./pages/LoadingScreen";
@@ -36,7 +35,7 @@ function App() {
           path="/capture"
           element={
             <PaymentGuard>
-              <Capture />
+              <CaptureV2 />
             </PaymentGuard>
           }
         />

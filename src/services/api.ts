@@ -160,21 +160,17 @@ export async function getFilters(): Promise<Filter[]> {
 
 export async function print(img): Promise<any[]> {
   try {
-    const response = await fetch(
-      import.meta.env.VITE_API_URL_PRINT + "print",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image_base64: img,
-          print_size: "6x4",
-          copies: 1,
-        }
-      ),
-      }
-    );
+    const response = await fetch(import.meta.env.VITE_API_URL_PRINT + "print", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        image_base64: img,
+        print_size: "6x4",
+        copies: 1,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -410,3 +406,4 @@ export function calculateDiscount(
     return voucher.discount_value;
   }
 }
+

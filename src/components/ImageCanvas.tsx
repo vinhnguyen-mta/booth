@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
+import { TEXT_IMG_SIZE } from "../constant/constant";
 
 interface ImageCanvasProps {
   selectedImages: string[];
   fillMode?: boolean;
+  img: string[];
   onImageProcessed?: (canvas: HTMLCanvasElement) => void;
 }
 
@@ -25,6 +27,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
   onImageProcessed,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const { selectedFrame, selectedFilter, setFinalImage, frames } =
     useAppStore();
 
@@ -34,12 +37,52 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
     }
   }, [selectedImages, selectedFilter, fillMode, selectedFrame, frames]);
 
-  const listResizeHeight = [
-    "1x3_horizontal_small",
-    "1x4_vertical_small",
-    "2x3_vertical_large",
-    "2x4_vertical_large",
-  ];
+  const getImgSize = (type: string) => {
+    let width = 0;
+    let height = 0;
+    switch (type) {
+      case TEXT_IMG_SIZE.IMG_1X1:
+        width = scale(2400);
+        height = scale(3600);
+        break;
+      case TEXT_IMG_SIZE.IMG_1X2_VERTICAL:
+        width = 3600;
+        height = 8200;
+        break;
+      case TEXT_IMG_SIZE.IMG_2X2_VERTICAL:
+        width = 2400;
+        height = 3600;
+        break;
+      case TEXT_IMG_SIZE.IMG_1X4_VERTICAL:
+        width = 1200;
+        height = 3600;
+        break;
+      case TEXT_IMG_SIZE.IMG_1X4_HORIZONTAL:
+        width = 3600;
+        height = 2400;
+        break;
+      case TEXT_IMG_SIZE.IMG_2X3_VERTICAL:
+        width = 2400;
+        height = 3600;
+        break;
+      case TEXT_IMG_SIZE.IMG_2X4_VERTICAL:
+        width = 2400;
+        height = 3600;
+        break;
+      case TEXT_IMG_SIZE.IMG_1X3_HORIZONTAL:
+        width = 3600;
+        height = 1200;
+        break;
+      default:
+        width = 3600;
+        height = 2400;
+        break;
+    }
+    return {
+      width,
+      height,
+    };
+  };
 
   const renderCanvas = async () => {
     if (!canvasRef.current || !selectedFrame) return;
@@ -48,8 +91,8 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
     if (!ctx) return;
 
     // setup size
-    canvas.width = 800;
-    canvas.height = listResizeHeight.includes(selectedFrame.code) ? 1200 : 800;
+    canvas.width = getImgSize(selectedFrame.code).width;
+    canvas.height = getImgSize(selectedFrame.code).height;
 
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -94,20 +137,9 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
   return (
     <canvas
       ref={canvasRef}
-      className={`w-[400px] border rounded shadow ${
-        listResizeHeight.includes(selectedFrame.code)
-          ? selectedFrame.code === "2x4_vertical_large" ||
-            selectedFrame.code === "1x4_vertical_small"
-            ? selectedFrame.code === "1x4_vertical_small"
-              ? "w-[300px] h-[700px]"
-              : "h-[700px]"
-            : selectedFrame.code === "1x3_horizontal_small"
-            ? "h-[300px] w-[600px]"
-            : "h-[600px]"
-          : selectedFrame.code === "1x4_horizontal_large"
-          ? "h-[400px]"
-          : "h-[600px]"
-      }`}
+      className={`border rounded shadow w-[${
+        getImgSize(selectedFrame.code).width
+      }px] h-[${getImgSize(selectedFrame.code).height}px]`}
     />
   );
 };
@@ -122,7 +154,7 @@ async function drawImagesWithLayout(
   fillMode: boolean
 ) {
   const loadedImages = await Promise.all(
-    images.map(
+    images?.map(
       (src) =>
         new Promise<HTMLImageElement>((resolve) => {
           const img = new Image();
@@ -137,7 +169,18 @@ async function drawImagesWithLayout(
   switch (layout) {
     case "1x1_vertical_large":
       if (loadedImages[0]) {
-        drawImageFit(ctx, loadedImages[0], 40, 70, 720, 600, "stretch");
+        await drawBase64CoverIntoCanvas(
+          convertRatioCanva({
+            ctx: ctx,
+            base64: loadedImages[0] as any,
+            dx: 136,
+            dy: 463,
+            frameW: 2128,
+            frameH: 2897,
+            focusX: 0.5,
+            focusY: 1,
+          })
+        );
       }
       break;
     case "1x2_vertical_large":
@@ -209,6 +252,124 @@ async function drawImagesWithLayout(
   }
 }
 
+function scale(value: number) {
+  return (value / 10) * 1.5;
+}
+
+const convertRatioCanva = (options: {
+  ctx: CanvasRenderingContext2D;
+  base64: any;
+  dx: number;
+  dy: number;
+  frameW: number;
+  frameH: number;
+  focusX?: number;
+  focusY?: number;
+}) => {
+  const {
+    ctx,
+    base64,
+    dx,
+    dy,
+    frameW,
+    frameH,
+    focusX = 0.5,
+    focusY = 0.5,
+  } = options;
+  return {
+    ctx,
+    base64,
+    dx: scale(dx),
+    dy: scale(dy),
+    frameW: scale(frameW),
+    frameH: scale(frameH),
+    focusX,
+    focusY,
+  };
+};
+
+export function calcCoverSrcRect(
+  imgW: number,
+  imgH: number,
+  frameW: number,
+  frameH: number,
+  focusX = 0.5,
+  focusY = 0.5
+) {
+  const srcAR = imgW / imgH;
+  const dstAR = frameW / frameH;
+
+  let sx = 0,
+    sy = 0,
+    sWidth = imgW,
+    sHeight = imgH;
+
+  if (srcAR > dstAR) {
+    sHeight = imgH;
+    sWidth = Math.round(imgH * dstAR);
+    sx = Math.round((imgW - sWidth) * focusX);
+    sx = Math.max(0, Math.min(imgW - sWidth, sx));
+    sy = 0;
+  } else {
+    sWidth = imgW;
+    sHeight = Math.round(imgW / dstAR);
+    sy = Math.round((imgH - sHeight) * focusY);
+    sy = Math.max(0, Math.min(imgH - sHeight, sy));
+    sx = 0;
+  }
+
+  return { sx, sy, sWidth, sHeight };
+}
+
+export async function drawBase64CoverIntoCanvas(options: {
+  ctx: CanvasRenderingContext2D;
+  base64: any;
+  dx: number;
+  dy: number;
+  frameW: number;
+  frameH: number;
+  focusX?: number;
+  focusY?: number;
+}) {
+  const {
+    ctx,
+    base64,
+    dx,
+    dy,
+    frameW,
+    frameH,
+    focusX = 0.5,
+    focusY = 0.5,
+  } = options;
+  if (!ctx) return;
+
+  const dpr = Math.max(1, Math.round(1));
+
+  const { sx, sy, sWidth, sHeight } = calcCoverSrcRect(
+    base64.width,
+    base64.height,
+    frameW,
+    frameH,
+    focusX,
+    focusY
+  );
+
+  const DDx = Math.round(dx * dpr);
+  const DDy = Math.round(dy * dpr);
+  const DDw = Math.round(frameW * dpr);
+  const DDh = Math.round(frameH * dpr);
+
+  ctx.imageSmoothingEnabled = true;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(DDx, DDy, DDw, DDh);
+  ctx.clip();
+
+  ctx.drawImage(base64, sx, sy, sWidth, sHeight, DDx, DDy, DDw, DDh);
+  ctx.restore();
+}
+
 function drawImageFit(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -235,9 +396,7 @@ function drawImageFit(
         drawWidth = height * imgAspect;
         drawX = x - (drawWidth - width) / 2;
         drawY = y;
-        console.log(3);
       } else {
-        console.log(4);
         drawWidth = width;
         drawHeight = width / imgAspect;
         drawX = x;
@@ -250,13 +409,11 @@ function drawImageFit(
       drawHeight = width / imgAspect;
       drawX = x;
       drawY = y + (height - drawHeight) / 2;
-      console.log(1);
     } else {
       drawHeight = height;
       drawWidth = height * imgAspect;
       drawX = x + (width - drawWidth) / 2;
       drawY = y;
-      console.log(2);
     }
   }
 
@@ -271,7 +428,6 @@ async function drawFrameOverlay(
   const blob = new Blob([svg], { type: "image/svg+xml" });
   const url = URL.createObjectURL(blob);
 
-  // tạo image cho SVG
   const svgImg = new Image();
   svgImg.src = url;
 

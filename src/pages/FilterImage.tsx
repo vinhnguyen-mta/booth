@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import ImageCanvas from "../components/ImageCanvas";
 import { FilterSelector } from "../components/FilterSelector.tsx";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import styles from "./Css.module.css";
-import { FilterSelectorIcons } from "../components/FilterSelectorIcons.tsx";
-import { ListImageSelected } from "./ListImageSelected.tsx";
 import { FilterSelectorFrame } from "../components/FilterSelectorIconsFrame.tsx";
 
 export const FilterImage: React.FC = () => {
@@ -23,7 +20,7 @@ export const FilterImage: React.FC = () => {
     setIcons,
     frames,
     setFrame,
-    selectedImg
+    selectedImg,
   } = useAppStore();
   const [fillMode, setFillMode] = useState(false);
 
@@ -66,7 +63,7 @@ export const FilterImage: React.FC = () => {
               </button>
             </div>
 
-            <div>
+            <div className="main-filter">
               <h2 className="text-lg font-normal mb-4">Chỉnh sửa ảnh</h2>
               <FilterSelector
                 selectedFilter={selectedFilter}

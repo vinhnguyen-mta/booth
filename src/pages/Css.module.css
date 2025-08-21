@@ -144,3 +144,13 @@
     gap: 12px;
   }
 }
+
+.main-filter {
+  position: relative;
+}
+
+.body-filter {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
