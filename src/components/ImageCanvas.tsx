@@ -163,8 +163,6 @@ async function drawImagesWithLayout(
     )
   );
 
-  const spacingX = 20;
-  const spacingY = 20;
   switch (layout) {
     case "1x1_vertical_large":
       if (loadedImages[0]) {
@@ -174,12 +172,13 @@ async function drawImagesWithLayout(
             base64: loadedImages[0] as any,
             dx: 136,
             dy: 463,
-            frameW: 2128,
+            frameW: 2130,
             frameH: 2897,
             focusX: 0.5,
             focusY: 1,
             pdTopImg: 0,
             pdLeftImg: 0,
+            index: 0,
           })
         );
       }
@@ -199,6 +198,7 @@ async function drawImagesWithLayout(
               focusY: 1,
               pdTopImg: index > 0 ? 60 : 0,
               pdLeftImg: 0,
+              index: index,
             })
           );
         }
@@ -211,14 +211,15 @@ async function drawImagesWithLayout(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
-              dx: 122 + (index % 2 !== 0 ? 1048 : 0),
+              dx: 123 + (index % 2 !== 0 ? 1048 : 0),
               dy: 462 + (index > 1 ? 1419 : 0),
-              frameW: 1048,
+              frameW: 1052,
               frameH: 1419,
               focusX: 0.5,
               focusY: 1,
               pdTopImg: index > 1 ? 60 : 0,
-              pdLeftImg: index % 2 !== 0 ? 60 : 0,
+              pdLeftImg: index % 2 !== 0 ? 60 : 2,
+              index: index,
             })
           );
         }
@@ -240,6 +241,7 @@ async function drawImagesWithLayout(
               pdTopImg: index > 0 ? 65 : 0,
               pdLeftImg: 0,
               multiplication: 1.2,
+              index: index,
             })
           );
         }
@@ -260,6 +262,7 @@ async function drawImagesWithLayout(
               focusY: 1,
               pdTopImg: index > 1 ? 60 : 0,
               pdLeftImg: index % 2 !== 0 ? 60 : 0,
+              index: index,
             })
           );
         }
@@ -280,6 +283,7 @@ async function drawImagesWithLayout(
               focusY: 1,
               pdTopImg: index > 1 ? 33 : 0,
               pdLeftImg: index % 2 !== 0 ? 33 : 0,
+              index: index,
             })
           );
         }
@@ -300,6 +304,7 @@ async function drawImagesWithLayout(
               focusY: 1,
               pdTopImg: index > 1 ? 25 : 0,
               pdLeftImg: index % 2 !== 0 ? 25 : 0,
+              index: index,
             })
           );
         }
@@ -320,6 +325,7 @@ async function drawImagesWithLayout(
               focusY: 1,
               pdTopImg: 0,
               pdLeftImg: index > 0 ? 60 : 0,
+              index: index,
             })
           );
         }
@@ -344,6 +350,7 @@ const convertRatioCanva = (options: {
   pdTopImg?: number;
   pdLeftImg?: number;
   multiplication?: number;
+  index: number;
 }) => {
   const {
     ctx,
@@ -357,18 +364,20 @@ const convertRatioCanva = (options: {
     pdTopImg = 0,
     pdLeftImg = 0,
     multiplication = 1,
+    index = 0,
   } = options;
   return {
     ctx,
     base64,
-    dx: scale(dx, multiplication),
-    dy: scale(dy, multiplication),
-    frameW: scale(frameW, multiplication),
-    frameH: scale(frameH, multiplication),
+    dx: Math.round(scale(dx, multiplication)),
+    dy: Math.round(scale(dy, multiplication)),
+    frameW: Math.round(scale(frameW, multiplication)),
+    frameH: Math.round(scale(frameH, multiplication)),
     focusX,
     focusY,
-    pdTopImg: scale(pdTopImg, multiplication),
-    pdLeftImg: scale(pdLeftImg, multiplication),
+    pdTopImg: Math.round(scale(pdTopImg, multiplication)),
+    pdLeftImg: Math.round(scale(pdLeftImg, multiplication)),
+    index,
   };
 };
 
@@ -407,7 +416,7 @@ export function calcCoverSrcRect(
 
 export async function drawBase64CoverIntoCanvas(options: {
   ctx: CanvasRenderingContext2D;
-  base64: any;
+  base64: HTMLImageElement | HTMLCanvasElement;
   dx: number;
   dy: number;
   frameW: number;
@@ -416,6 +425,7 @@ export async function drawBase64CoverIntoCanvas(options: {
   focusY?: number;
   pdTopImg?: number;
   pdLeftImg?: number;
+  index?: number;
 }) {
   const {
     ctx,
@@ -428,6 +438,7 @@ export async function drawBase64CoverIntoCanvas(options: {
     focusY = 0.5,
     pdTopImg = 0,
     pdLeftImg = 0,
+    index = 0,
   } = options;
   console.log("options", options);
   if (!ctx) return;
