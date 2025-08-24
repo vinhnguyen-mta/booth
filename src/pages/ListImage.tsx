@@ -84,7 +84,7 @@ export const ListImage: React.FC = () => {
       case "2x4_vertical_large":
         return "grid grid-cols-2 gap-4";
       case "1x3_horizontal_small":
-        return "flex flex-col";
+        return "grid grid-cols-3";
       default:
         return "flex flex-col";
     }
