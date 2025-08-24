@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TEXT_IMG_SIZE } from "../constant/constant";
+import { Filter, getFilters } from "../services/api";
 
 interface ImageCanvasProps {
   selectedImages: string[];
@@ -8,7 +9,7 @@ interface ImageCanvasProps {
   onImageProcessed?: (canvas: HTMLCanvasElement) => void;
 }
 
-const filters: Record<string, string> = {
+const filterDefault: Record<string, string> = {
   bw: "grayscale(100%)",
   warm: "sepia(30%) saturate(120%) hue-rotate(15deg)",
   cold: "hue-rotate(180deg) saturate(120%)",
@@ -26,9 +27,26 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
   onImageProcessed,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [filters, setFilters] = useState<Record<string, string>>(filterDefault);
 
   const { selectedFrame, selectedFilter, setFinalImage, frames } =
     useAppStore();
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const filtersData = await getFilters();
+        const filters: Record<string, string> = filtersData.reduce((acc, f) => {
+          const key = f.id;
+          acc[key] = f.css_filter;
+          return acc;
+        }, {} as Record<string, string>);
+        setFilters(filters);
+      } catch (error) {}
+    };
+
+    loadFilters();
+  }, []);
 
   useEffect(() => {
     if (selectedFrame && selectedImages?.length > 0) {
@@ -176,9 +194,6 @@ async function drawImagesWithLayout(
             frameH: 2897,
             focusX: 0.5,
             focusY: 1,
-            pdTopImg: 0,
-            pdLeftImg: 0,
-            index: 0,
           })
         );
       }
@@ -186,19 +201,17 @@ async function drawImagesWithLayout(
     case "1x2_vertical_large":
       loadedImages.slice(0, 2).forEach(async (img, index) => {
         if (img) {
+          const pdTop = 60;
           await drawBase64CoverIntoCanvas(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
-              dx: 130,
-              dy: 514 + index * 1393,
+              dx: 128,
+              dy: 514 + index * (1393 + pdTop),
               frameW: 2140,
               frameH: 1393,
               focusX: 0.5,
               focusY: 1,
-              pdTopImg: index > 0 ? 60 : 0,
-              pdLeftImg: 0,
-              index: index,
             })
           );
         }
@@ -207,19 +220,18 @@ async function drawImagesWithLayout(
     case "2x2_vertical_large":
       loadedImages.slice(0, 4).forEach(async (img, index) => {
         if (img) {
+          const pdTop = 60;
+          const pdLeft = 60;
           await drawBase64CoverIntoCanvas(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
-              dx: 123 + (index % 2 !== 0 ? 1048 : 0),
-              dy: 462 + (index > 1 ? 1419 : 0),
+              dx: 123 + (index % 2 !== 0 ? 1048 + pdLeft : 0),
+              dy: 462 + (index > 1 ? 1419 + pdTop : 0),
               frameW: 1052,
               frameH: 1419,
               focusX: 0.5,
               focusY: 1,
-              pdTopImg: index > 1 ? 60 : 0,
-              pdLeftImg: index % 2 !== 0 ? 60 : 2,
-              index: index,
             })
           );
         }
@@ -228,20 +240,18 @@ async function drawImagesWithLayout(
     case "1x4_vertical_small":
       loadedImages.slice(0, 4).forEach(async (img, index) => {
         if (img) {
+          const pdTop = 65;
           await drawBase64CoverIntoCanvas(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
               dx: 77,
-              dy: 473 + index * 671,
+              dy: 473 + index * (671 + pdTop),
               frameW: 1045,
               frameH: 671,
               focusX: 0.5,
               focusY: 1,
-              pdTopImg: index > 0 ? 65 : 0,
-              pdLeftImg: 0,
               multiplication: 1.2,
-              index: index,
             })
           );
         }
@@ -250,64 +260,81 @@ async function drawImagesWithLayout(
     case "1x4_horizontal_large":
       loadedImages.slice(0, 4).forEach(async (img, index) => {
         if (img) {
+          const pdTop = 60;
+          const pdLeft = 60;
           await drawBase64CoverIntoCanvas(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
-              dx: 133 + (index % 2 !== 0 ? 1637 : 0),
-              dy: 424 + (index > 1 ? 900 : 0),
-              frameW: 1637,
+              dx: 128 + (index % 2 !== 0 ? 1637 + pdLeft : 0),
+              dy: 396 + (index > 1 ? 898 + pdTop : 0),
+              frameW: 1644,
               frameH: 900,
               focusX: 0.5,
               focusY: 1,
-              pdTopImg: index > 1 ? 60 : 0,
-              pdLeftImg: index % 2 !== 0 ? 60 : 0,
-              index: index,
             })
           );
         }
       });
       break;
     case "2x3_vertical_large":
+      const frameW = 1062;
+      const frameH = 988;
+
+      const marginX = 121;
+      const marginTop = 333;
+      const gapX = 33;
+      const gapY = 33;
+
       loadedImages.slice(0, 6).forEach(async (img, index) => {
-        if (img) {
-          await drawBase64CoverIntoCanvas(
-            convertRatioCanva({
-              ctx: ctx,
-              base64: img as any,
-              dx: 121 + (index % 2 !== 0 ? 1062 : 0),
-              dy: 424 + (index > 1 ? Math.floor(index / 2) * 988 : 0),
-              frameW: 1062,
-              frameH: 988,
-              focusX: 0.5,
-              focusY: 1,
-              pdTopImg: index > 1 ? 33 : 0,
-              pdLeftImg: index % 2 !== 0 ? 33 : 0,
-              index: index,
-            })
-          );
-        }
+        if (!img) return;
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const dx = marginX + col * (frameW + gapX);
+        const dy = marginTop + row * (frameH + gapY);
+
+        await drawBase64CoverIntoCanvas(
+          convertRatioCanva({
+            ctx,
+            base64: img as any,
+            dx,
+            dy,
+            frameW,
+            frameH,
+            focusX: 0.5,
+            focusY: 1,
+          })
+        );
       });
       break;
     case "2x4_vertical_large":
+      const frameW2X4 = 1058;
+      const frameH2X4 = 738;
+
+      const marginX2X4 = 129;
+      const marginTop2X4 = 331;
+      const gapX2X4 = 25;
+      const gapY2X4 = 25;
+
       loadedImages.slice(0, 8).forEach(async (img, index) => {
-        if (img) {
-          await drawBase64CoverIntoCanvas(
-            convertRatioCanva({
-              ctx: ctx,
-              base64: img as any,
-              dx: 129 + (index % 2 !== 0 ? 1058 : 0),
-              dy: 331 + (index > 1 ? Math.floor(index / 2) * 738 : 0),
-              frameW: 1058,
-              frameH: 738,
-              focusX: 0.5,
-              focusY: 1,
-              pdTopImg: index > 1 ? 25 : 0,
-              pdLeftImg: index % 2 !== 0 ? 25 : 0,
-              index: index,
-            })
-          );
-        }
+        if (!img) return;
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const dx = marginX2X4 + col * (frameW2X4 + gapX2X4);
+        const dy = marginTop2X4 + row * (frameH2X4 + gapY2X4);
+
+        await drawBase64CoverIntoCanvas(
+          convertRatioCanva({
+            ctx,
+            base64: img as any,
+            dx,
+            dy,
+            frameW: frameW2X4,
+            frameH: frameH2X4,
+            focusX: 0.5,
+            focusY: 1,
+          })
+        );
       });
       break;
     case "1x3_horizontal_small":
@@ -323,9 +350,6 @@ async function drawImagesWithLayout(
               frameH: 821,
               focusX: 0.5,
               focusY: 1,
-              pdTopImg: 0,
-              pdLeftImg: index > 0 ? 60 : 0,
-              index: index,
             })
           );
         }
@@ -347,10 +371,7 @@ const convertRatioCanva = (options: {
   frameH: number;
   focusX?: number;
   focusY?: number;
-  pdTopImg?: number;
-  pdLeftImg?: number;
   multiplication?: number;
-  index: number;
 }) => {
   const {
     ctx,
@@ -361,10 +382,7 @@ const convertRatioCanva = (options: {
     frameH,
     focusX = 0.5,
     focusY = 0.5,
-    pdTopImg = 0,
-    pdLeftImg = 0,
     multiplication = 1,
-    index = 0,
   } = options;
   return {
     ctx,
@@ -375,9 +393,6 @@ const convertRatioCanva = (options: {
     frameH: Math.round(scale(frameH, multiplication)),
     focusX,
     focusY,
-    pdTopImg: Math.round(scale(pdTopImg, multiplication)),
-    pdLeftImg: Math.round(scale(pdLeftImg, multiplication)),
-    index,
   };
 };
 
@@ -425,7 +440,6 @@ export async function drawBase64CoverIntoCanvas(options: {
   focusY?: number;
   pdTopImg?: number;
   pdLeftImg?: number;
-  index?: number;
 }) {
   const {
     ctx,
@@ -436,9 +450,6 @@ export async function drawBase64CoverIntoCanvas(options: {
     frameH,
     focusX = 0.5,
     focusY = 0.5,
-    pdTopImg = 0,
-    pdLeftImg = 0,
-    index = 0,
   } = options;
   console.log("options", options);
   if (!ctx) return;
@@ -466,17 +477,7 @@ export async function drawBase64CoverIntoCanvas(options: {
   ctx.rect(DDx, DDy, DDw, DDh);
   ctx.clip();
 
-  ctx.drawImage(
-    base64,
-    sx,
-    sy,
-    sWidth,
-    sHeight,
-    DDx + pdLeftImg,
-    DDy + pdTopImg,
-    DDw,
-    DDh
-  );
+  ctx.drawImage(base64, sx, sy, sWidth, sHeight, DDx, DDy, DDw, DDh);
   ctx.restore();
 }
 
