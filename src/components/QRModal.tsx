@@ -45,7 +45,7 @@ export const QRModal: React.FC<QRModalProps> = ({
 
       paymentChecker = setInterval(() => {
         checkPaymentSuccess();
-      }, 3000);
+      }, 10000);
     }
 
     return () => {

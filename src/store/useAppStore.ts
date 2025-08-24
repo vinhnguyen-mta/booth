@@ -107,7 +107,11 @@ export const useAppStore = create<AppStore>()(
         set({ totalPrice });
       },
 
-      resetSession: () => set(initialState),
+      resetSession: () =>
+        set((state) => ({
+          ...initialState,
+          session_token: state.session_token,
+        })),
 
       // UPDATE: Payment guard implementation
       canAccessCapture: () => {

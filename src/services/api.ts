@@ -372,16 +372,19 @@ export async function getPaymentQR(layout_id: string): Promise<any> {
 export async function getPaymentQRSuccess(): Promise<any> {
   try {
     const session_token = useAppStore.getState().session_token;
-    const response = await fetch(import.meta.env.VITE_API_URL + "qr-checker", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
-      body: JSON.stringify({
-        token: token,
-      }),
-    });
+    const response = await fetch(
+      import.meta.env.VITE_API_URL + "check-payment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session_token}`,
+        },
+        body: JSON.stringify({
+          token: token,
+        }),
+      }
+    );
     const data = await response.json();
     return data.data;
   } catch (error) {
