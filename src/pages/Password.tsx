@@ -5,10 +5,12 @@ import { useAppStore } from "../store/useAppStore";
 import { Layout } from "../components/Layout";
 import { NumericKeypad } from "../components/NumericKeypad";
 import styles from "./Css.module.css";
+import { getSessionToken } from "../services/api";
+import { toast } from "../components/Toast";
 
 export const Password: React.FC = () => {
   const navigate = useNavigate();
-  const { setCurrentStep } = useAppStore();
+  const { setCurrentStep, setSessionToken } = useAppStore();
 
   const [voucherCode, setVoucherCode] = useState("");
 
@@ -17,7 +19,8 @@ export const Password: React.FC = () => {
     if (voucherCode.length === 6) {
       // Có thể thêm logic kiểm tra mật khẩu đúng ở đây
       setTimeout(() => {
-        navigate("/landing");
+        // navigate("/landing");
+        getToken(voucherCode);
       }, 300); // Delay nhỏ để người dùng thấy đủ 6 số
     }
   }, [voucherCode]);
@@ -25,6 +28,20 @@ export const Password: React.FC = () => {
   const handleBack = () => {
     setCurrentStep(2);
     navigate("/qr-download");
+  };
+
+  const getToken = async (password: string) => {
+    try {
+      const methods = await getSessionToken(password);
+      if (methods?.session_token) {
+        setSessionToken(methods.session_token);
+        navigate("/landing");
+      } else {
+        toast.error("Sai mật khẩu. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Error loading payment methods:", error);
+    }
   };
 
   const handleVoucherInput = (digit: string) => {
@@ -37,9 +54,10 @@ export const Password: React.FC = () => {
   const handleVoucherClear = () => setVoucherCode("");
 
   const handleNext = () => {
-    useAppStore.getState().setPaymentStatus("success");
-    setCurrentStep(4);
-    navigate("/end");
+    // useAppStore.getState().setPaymentStatus("success");
+    // setCurrentStep(4);
+    // navigate("/end");
+    getToken(voucherCode);
   };
 
   return (

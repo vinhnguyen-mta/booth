@@ -16,6 +16,7 @@ export interface AppState {
   icons: string;
   selectedImg: any | null;
   frames: any;
+  session_token: any;
 }
 
 // UPDATE: Payment interfaces moved to services/api.ts

@@ -17,7 +17,7 @@ interface AppStore extends AppState {
   setFinalImage: (image: string | null) => void;
   setPaymentMethod: (method: "cash" | "qr" | null) => void;
   setPaymentStatus: (
-    status: "pending" | "processing" | "success" | "failed",
+    status: "pending" | "processing" | "success" | "failed"
   ) => void;
   setLanguage: (language: "en" | "vi") => void;
   calculateTotalPrice: () => void;
@@ -31,7 +31,8 @@ interface AppStore extends AppState {
   setFullscreen: (isFullscreen: boolean) => void;
   setIcons: (icon: string) => void;
   setFrame: (frame: string | null) => void;
-  setSelectedImg: (img: any)=> void;
+  setSelectedImg: (img: any) => void;
+  setSessionToken: (token: string) => void;
 }
 
 const initialState: AppState = {
@@ -48,7 +49,8 @@ const initialState: AppState = {
   language: "vi",
   totalPrice: 0,
   selectedImg: null,
-  frames: []
+  frames: [],
+  session_token: "",
 };
 
 export const useAppStore = create<AppStore>()(
@@ -90,7 +92,7 @@ export const useAppStore = create<AppStore>()(
       setFinalImage: (image) => set({ finalImage: image }),
       setIcons: (icon) => set({ icons: icon }),
       setFrame: (frame) => set({ frames: frame }),
-      setSelectedImg:  (img)=> {
+      setSelectedImg: (img) => {
         set({ selectedImg: img });
       },
       setPaymentMethod: (method) => set({ paymentMethod: method }),
@@ -120,6 +122,7 @@ export const useAppStore = create<AppStore>()(
       isFullscreen: false,
 
       setFullscreen: (isFullscreen) => set({ isFullscreen }),
+      setSessionToken: (sessionToken) => set({ session_token: sessionToken }),
     }),
     {
       name: "photobooth-store",
@@ -133,6 +136,6 @@ export const useAppStore = create<AppStore>()(
         // UPDATE: Persist fullscreen state across navigation
         isFullscreen: state.isFullscreen,
       }),
-    },
-  ),
+    }
+  )
 );

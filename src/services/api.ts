@@ -1,6 +1,8 @@
 // PhotoBooth API Service
 // Mock API functions that will be replaced with real API calls later
 
+import { useAppStore } from "../store/useAppStore";
+
 export interface AppConfig {
   defaultPhotoCount: number;
   maxPhotoCount: number;
@@ -147,10 +149,12 @@ export async function login(code: string): Promise<any[]> {
 // TODO: Replace with real API call
 export async function getFrames(): Promise<Frame[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
     const response = await fetch(import.meta.env.VITE_API_URL + "layouts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         token: token,
@@ -166,10 +170,13 @@ export async function getFrames(): Promise<Frame[]> {
 
 export async function getIcons(): Promise<Icons[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
+
     const response = await fetch(import.meta.env.VITE_API_URL + "icons", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         token: token,
@@ -186,10 +193,13 @@ export async function getIcons(): Promise<Icons[]> {
 // TODO: Replace with real API call
 export async function getFilters(): Promise<Filter[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
+
     const response = await fetch(import.meta.env.VITE_API_URL + "filter", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         token: token,
@@ -205,10 +215,12 @@ export async function getFilters(): Promise<Filter[]> {
 
 export async function print(img): Promise<any[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
     const response = await fetch(import.meta.env.VITE_API_URL_PRINT + "print", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         image_base64: img,
@@ -227,12 +239,15 @@ export async function print(img): Promise<any[]> {
 
 export async function printFilters(img): Promise<any[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
+
     const response = await fetch(
       import.meta.env.VITE_API_URL_PRINT + "filters",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session_token}`,
         },
         body: JSON.stringify({
           image_path: img,
@@ -253,10 +268,13 @@ export async function printFilters(img): Promise<any[]> {
 
 export async function getFiltersFrame(layout_code: any): Promise<Filter[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
+
     const response = await fetch(import.meta.env.VITE_API_URL + "frames", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         layout_code,
@@ -283,12 +301,38 @@ export async function getPaymentMethods(): Promise<PaymentMethod[]> {
   }
 }
 
+export async function getSessionToken(password: string): Promise<any> {
+  try {
+    const session_token = useAppStore.getState().session_token;
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "credential", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: JSON.stringify({
+        token: token,
+        password: password,
+      }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error loading payment methods:", error);
+    return [];
+  }
+}
+
 export async function getPaymentCompany(): Promise<PaymentCompany[]> {
   try {
+    const session_token = useAppStore.getState().session_token;
+
     const response = await fetch(import.meta.env.VITE_API_URL + "company", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
       },
       body: JSON.stringify({
         token: token,
