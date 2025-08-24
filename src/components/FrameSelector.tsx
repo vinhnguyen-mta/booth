@@ -72,44 +72,49 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({
       </button> */}
 
       <div className={styles.container} ref={containerRef}>
-        {frames.slice(0, 8).map((frame, index) => {
-          const isSelected = selectedFrame?.id === frame.id;
-          return (
-            <motion.div
-              key={frame.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.06 }}
-              className={`${styles.item} ${isSelected ? styles.selected : ""}`}
-              onClick={() => onFrameSelect(frame)}
-            >
-              <div className={styles.titleBadge}>
-                <span>{language === "vi" ? frame.name : "Ảnh"}</span>
-              </div>
-
-              <div className={styles.previewWrap}>
-                <div className={styles.frameStroke}>
-                  <img src={frame.image} alt="preview" />
+        {frames &&
+          frames.slice(0, 8).map((frame, index) => {
+            const isSelected = selectedFrame?.id === frame.id;
+            return (
+              <motion.div
+                key={frame.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.06 }}
+                className={`${styles.item} ${
+                  isSelected ? styles.selected : ""
+                }`}
+                onClick={() => onFrameSelect(frame)}
+              >
+                <div className={styles.titleBadge}>
+                  <span>{language === "vi" ? frame.name : "Ảnh"}</span>
                 </div>
-              </div>
 
-              <div className={styles.footer}>
-                <div className={styles.panels}>
-                  {frame.panels} {language === "vi" ? "ảnh" : "cut"}
-                </div>
-                <div className={styles.price}>{formatPrice(frame.price)}₫</div>
-              </div>
-
-              {isSelected && (
-                <>
-                  <div className={styles.checkBadge} aria-hidden>
-                    <Check className="w-4 h-4 text-white" />
+                <div className={styles.previewWrap}>
+                  <div className={styles.frameStroke}>
+                    <img src={frame.image} alt="preview" />
                   </div>
-                </>
-              )}
-            </motion.div>
-          );
-        })}
+                </div>
+
+                <div className={styles.footer}>
+                  <div className={styles.panels}>
+                    {frame.panels} {language === "vi" ? "ảnh" : "cut"}
+                  </div>
+                  <div className={styles.price}>
+                    {formatPrice(frame.price)}₫
+                  </div>
+                </div>
+
+                {isSelected && (
+                  <>
+                    <div className={styles.checkBadge} aria-hidden>
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            );
+          })}
       </div>
 
       {/* Right arrow: chỉ render khi có selection */}

@@ -57,13 +57,13 @@ export const ExportImage: React.FC = () => {
         </div>
 
         {/* Left / Right arrows (same style as other screens) */}
-        <button
+        {/* <button
           aria-label="Prev"
           onClick={handleBack}
           className={styles.navButtonLeft}
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
+        </button> */}
 
         <button
           aria-label="Next"

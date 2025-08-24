@@ -23,7 +23,7 @@ export const QRDownload: React.FC = () => {
 
   const handleNext = () => {
     resetSession();
-    navigate("/password");
+    navigate("/landing");
   };
 
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
