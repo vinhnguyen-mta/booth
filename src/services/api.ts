@@ -123,10 +123,39 @@ export async function getAppConfig(): Promise<AppConfig> {
   };
 }
 
+const token = "429b4811";
+
+export async function login(code: string): Promise<any[]> {
+  try {
+    const response = await fetch(import.meta.env.VITE_API_LOGIN + "password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        login: code,
+      }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error loading filters:", error);
+    return [];
+  }
+}
+
 // TODO: Replace with real API call
 export async function getFrames(): Promise<Frame[]> {
   try {
-    const response = await fetch(import.meta.env.VITE_API_URL + "layouts");
+    const response = await fetch(import.meta.env.VITE_API_URL + "layouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -137,7 +166,15 @@ export async function getFrames(): Promise<Frame[]> {
 
 export async function getIcons(): Promise<Icons[]> {
   try {
-    const response = await fetch(import.meta.env.VITE_API_URL + "icons");
+    const response = await fetch(import.meta.env.VITE_API_URL + "icons", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -149,7 +186,15 @@ export async function getIcons(): Promise<Icons[]> {
 // TODO: Replace with real API call
 export async function getFilters(): Promise<Filter[]> {
   try {
-    const response = await fetch(import.meta.env.VITE_API_URL + "filter");
+    const response = await fetch(import.meta.env.VITE_API_URL + "filter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -169,6 +214,7 @@ export async function print(img): Promise<any[]> {
         image_base64: img,
         print_size: "6x4",
         copies: 1,
+        token: token,
       }),
     });
     const data = await response.json();
@@ -193,6 +239,7 @@ export async function printFilters(img): Promise<any[]> {
           print_size: "6x4",
           cut_2inch: true,
           copies: 1,
+          token: token,
         }),
       }
     );
@@ -213,6 +260,7 @@ export async function getFiltersFrame(layout_code: any): Promise<Filter[]> {
       },
       body: JSON.stringify({
         layout_code,
+        token: token,
       }),
     });
     const data = await response.json();
@@ -237,7 +285,15 @@ export async function getPaymentMethods(): Promise<PaymentMethod[]> {
 
 export async function getPaymentCompany(): Promise<PaymentCompany[]> {
   try {
-    const response = await fetch(import.meta.env.VITE_API_URL + "company");
+    const response = await fetch(import.meta.env.VITE_API_URL + "company", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    });
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -353,6 +409,7 @@ export async function validateVoucher(
         },
         body: JSON.stringify({
           code,
+          token: token,
         }),
       }
     );
@@ -406,4 +463,3 @@ export function calculateDiscount(
     return voucher.discount_value;
   }
 }
-
