@@ -48,7 +48,7 @@ export const Payment: React.FC = () => {
     }
   };
 
-    const loadPaymentCompany = async () => {
+  const loadPaymentCompany = async () => {
     try {
       const companyApi = await getPaymentCompany();
       console.log("companyApi", companyApi);
@@ -203,7 +203,7 @@ export const Payment: React.FC = () => {
         <div className={styles.content}>
           {/* Left column: summary & payment methods */}
           <div className={styles.leftCol}>
-            <div className={styles.summaryCard} onClick={handlePaymentSuccess}>
+            <div className={styles.summaryCard}>
               <div className={styles.summaryRow}>
                 <span className={styles.muted}>{t.totalPrice}:</span>
                 <span className={styles.totalValue}>
@@ -360,7 +360,7 @@ export const Payment: React.FC = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <button
+        {/* <button
           aria-label="Next"
           onClick={() => {
             // tiến tới màn TOTAL PAYMENT khi người dùng bấm mũi tên phải
@@ -370,7 +370,7 @@ export const Payment: React.FC = () => {
           className={styles.navButtonRight}
         >
           <ChevronRight className="w-5 h-5" />
-        </button>
+        </button> */}
 
         {/* Modals */}
         <AnimatePresence>

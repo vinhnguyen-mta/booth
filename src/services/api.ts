@@ -346,6 +346,50 @@ export async function getPaymentCompany(): Promise<PaymentCompany[]> {
   }
 }
 
+export async function getPaymentQR(layout_id: string): Promise<any> {
+  try {
+    const session_token = useAppStore.getState().session_token;
+    const response = await fetch(import.meta.env.VITE_API_URL + "gen-qrcode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: JSON.stringify({
+        token: token,
+        quantity: 1,
+        layout_id: layout_id,
+      }),
+    });
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading payment methods:", error);
+    return [];
+  }
+}
+
+export async function getPaymentQRSuccess(): Promise<any> {
+  try {
+    const session_token = useAppStore.getState().session_token;
+    const response = await fetch(import.meta.env.VITE_API_URL + "qr-checker", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    });
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading payment methods:", error);
+    return [];
+  }
+}
+
 // TODO: Replace with real API call
 export async function createPayment(
   amount: number,

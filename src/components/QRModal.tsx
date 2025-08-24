@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Clock } from "lucide-react";
 import QRCode from "qrcode";
 import styles from "./QRModal.module.css";
+import { getPaymentQR, getPaymentQRSuccess } from "../services/api";
+import { useAppStore } from "../store/useAppStore";
+import { useNavigate } from "react-router-dom";
 
 interface QRModalProps {
   isOpen: boolean;
@@ -21,39 +24,53 @@ export const QRModal: React.FC<QRModalProps> = ({
   onClose,
   paymentData,
   language,
-  company
+  company,
 }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(0);
+  const navigate = useNavigate();
+  const { selectedFrame, setCurrentStep } = useAppStore();
 
   useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    let paymentChecker: NodeJS.Timeout | null = null;
+
     if (isOpen && paymentData) {
       generateQRCode();
       calculateTimeLeft();
 
-      const timer = setInterval(() => {
+      timer = setInterval(() => {
         calculateTimeLeft();
       }, 1000);
 
-      return () => clearInterval(timer);
+      paymentChecker = setInterval(() => {
+        checkPaymentSuccess();
+      }, 3000);
     }
+
+    return () => {
+      if (timer) clearInterval(timer);
+      if (paymentChecker) clearInterval(paymentChecker);
+    };
   }, [isOpen, paymentData]);
 
   const generateQRCode = async () => {
     try {
-      const paymentUrl = `https://payment.example.com/pay/${paymentData.paymentId}?amount=${paymentData.amount}`;
-      const dataUrl = await QRCode.toDataURL(company?.qr_code_path ? company?.qr_code_path : paymentUrl, {
-        width: 512,
-        margin: 2,
-        color: {
-          dark: "#00167a",
-          light: "#ffffff",
-        },
-      });
-      setQrDataUrl(dataUrl);
+      const paymentUrl = await getPaymentQR(selectedFrame.id);
+      setQrDataUrl(paymentUrl.url);
     } catch (error) {
       console.error("Error generating QR code:", error);
     }
+  };
+
+  const checkPaymentSuccess = async () => {
+    try {
+      const paymentUrl = await getPaymentQRSuccess();
+      if (paymentUrl?.status === 200) {
+        setCurrentStep(4);
+        navigate("/loading");
+      }
+    } catch (error) {}
   };
 
   const calculateTimeLeft = () => {

@@ -85,7 +85,10 @@ export const TotalPayment: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ cursor: "pointer", display: "flex", gap: "6px" }} onClick={handleDotClick}>
+            <div
+              style={{ cursor: "pointer", display: "flex", gap: "6px" }}
+              onClick={handleDotClick}
+            >
               <div className={styles.centerDot}></div>
               <div className={`${styles.centerDot} ${styles.dot2}`}></div>
               <div className={`${styles.centerDot} ${styles.dot3}`}></div>
@@ -109,13 +112,13 @@ export const TotalPayment: React.FC = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <button
+        {/* <button
           aria-label="Next"
           className={styles.navButtonRight}
           onClick={handleNext}
         >
           <ChevronRight className="w-5 h-5" />
-        </button>
+        </button> */}
       </div>
     </Layout>
   );
