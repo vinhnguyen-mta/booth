@@ -599,7 +599,7 @@ export const CaptureV2: React.FC = () => {
                 }}
               >
                 {capturedCount <= totalShots && (
-                  <CountdownBadge count={count}/>
+                  <CountdownBadge count={count} />
                 )}
 
                 <video

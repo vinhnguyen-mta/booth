@@ -96,9 +96,9 @@ export const  FilterSelector: React.FC<FilterSelectorProps> = ({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onFilterSelect(filter.id)}
+              onClick={() => onFilterSelect(filter.name)}
               className={`flex items-center justify-center w-20 h-20 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
-                selectedFilter === filter.id
+                selectedFilter === filter.name
                   ? "border-primary bg-primary/10 text-primary shadow-lg ring-2 ring-primary/20"
                   : "border-gray-200 hover:border-primary/30 text-gray-700 hover:shadow-md"
               }`}

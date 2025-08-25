@@ -69,7 +69,7 @@ export const ExportImage: React.FC = () => {
           <img
             src={finalImage}
             alt="Ảnh đã chọn"
-            style={{ width: "400px", height: "400px" }}
+            className="border rounded shadow"
           />
 
           {/* Text dưới */}

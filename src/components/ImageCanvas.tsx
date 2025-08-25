@@ -37,7 +37,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
       try {
         const filtersData = await getFilters();
         const filters: Record<string, string> = filtersData.reduce((acc, f) => {
-          const key = f.id;
+          const key = f.name;
           acc[key] = f.css_filter;
           return acc;
         }, {} as Record<string, string>);
