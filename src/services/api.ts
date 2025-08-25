@@ -125,7 +125,10 @@ export async function getAppConfig(): Promise<AppConfig> {
   };
 }
 
-export const token = "429b4811";
+const segments = window.location.pathname.split("/").filter(Boolean);
+const i = segments.indexOf("devices");
+export const token = i >= 0 && segments[i + 1] ? segments[i + 1] : "429b4811";
+// 429b4811 là backup nếu không có url trong lúc test
 
 export async function login(code: string): Promise<any[]> {
   try {
@@ -216,19 +219,22 @@ export async function getFilters(): Promise<Filter[]> {
 export async function print(img): Promise<any[]> {
   try {
     const session_token = useAppStore.getState().session_token;
-    const response = await fetch(import.meta.env.VITE_API_URL_PRINT + "print", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
-      body: JSON.stringify({
-        image_base64: img,
-        print_size: "6x4",
-        copies: 1,
-        token: token,
-      }),
-    });
+    const response = await fetch(
+      import.meta.env.VITE_API_URL_PRINT + "print/base64/full",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session_token}`,
+        },
+        body: JSON.stringify({
+          image_base64: img,
+          print_size: "6x4",
+          copies: 1,
+          token: token,
+        }),
+      }
+    );
     const data = await response.json();
     return data.data;
   } catch (error) {
