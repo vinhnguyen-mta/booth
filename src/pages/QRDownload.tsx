@@ -32,7 +32,6 @@ export const QRDownload: React.FC = () => {
     generateQRCode();
     console.log("capturedVideos", capturedVideos);
     console.log("selectedFrame", selectedFrame);
-    
   }, []);
 
   const generateQRCode = async () => {

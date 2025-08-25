@@ -105,7 +105,7 @@ export const CaptureV2: React.FC = () => {
 
     try {
       const mediaRecorder = new MediaRecorder(streamRef.current, {
-        mimeType: "video/webm;codecs=vp9", // Try VP9 first
+        mimeType: "video/webm;codecs=vp9",
       });
 
       mediaRecorder.ondataavailable = (event) => {

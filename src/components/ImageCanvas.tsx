@@ -344,7 +344,7 @@ async function drawImagesWithLayout(
             convertRatioCanva({
               ctx: ctx,
               base64: img as any,
-              dx: 97 + (index > 0 ? index * 1095 : 0),
+              dx: 97 + (index > 0 ? index * (1095 + 60) : 0),
               dy: 295,
               frameW: 1095,
               frameH: 821,
