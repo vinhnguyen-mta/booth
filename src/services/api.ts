@@ -125,7 +125,7 @@ export async function getAppConfig(): Promise<AppConfig> {
   };
 }
 
-const token = "429b4811";
+export const token = "429b4811";
 
 export async function login(code: string): Promise<any[]> {
   try {
@@ -339,6 +339,25 @@ export async function getPaymentCompany(): Promise<PaymentCompany[]> {
       }),
     });
     const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error loading payment methods:", error);
+    return [];
+  }
+}
+
+export async function uploadImg(img: any): Promise<any> {
+  try {
+    const session_token = useAppStore.getState().session_token;
+    const response = await fetch(import.meta.env.VITE_API_URL + "upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: img,
+    });
+    const data = await response.json();
+
     return data.data;
   } catch (error) {
     console.error("Error loading payment methods:", error);

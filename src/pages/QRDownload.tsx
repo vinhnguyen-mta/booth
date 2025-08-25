@@ -6,6 +6,7 @@ import styles from "./Css.module.css";
 import ImageCanvas from "../components/ImageCanvas.tsx";
 import { useAppStore } from "../store/useAppStore.ts";
 import QRCode from "qrcode";
+import { token, uploadImg } from "../services/api.ts";
 
 export const QRDownload: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const QRDownload: React.FC = () => {
     selectedImg,
     selectedFrame,
   } = useAppStore();
+
   const handleBack = () => {
     navigate("/export-image", { state: { fillMode, capturedImages } });
   };
@@ -28,16 +30,32 @@ export const QRDownload: React.FC = () => {
 
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
+  function dataURLToBlob(dataURL: any): Blob {
+    const [meta, b64] = dataURL.split(",");
+    const mime = /data:(.*?);/.exec(meta)?.[1] || "image/jpeg";
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+  }
+
+  async function uploadBlob(blob: Blob, filename = "image.jpg") {
+    const fd = new FormData();
+    fd.append("file", new File([blob], filename, { type: blob.type }));
+    fd.append("token", token);
+    const res = await uploadImg(fd);
+    generateQRCode(res?.url);
+    return;
+  }
+
   useEffect(() => {
-    generateQRCode();
-    console.log("capturedVideos", capturedVideos);
-    console.log("selectedFrame", selectedFrame);
+    const blob = dataURLToBlob(finalImage);
+    uploadBlob(blob, "image.jpg");
   }, []);
 
-  const generateQRCode = async () => {
+  const generateQRCode = async (link: any) => {
     try {
-      const paymentUrl = `https://payment.example.com/pay/`;
-      const dataUrl = await QRCode.toDataURL(paymentUrl, {
+      const dataUrl = await QRCode.toDataURL(link, {
         width: 512,
         margin: 2,
         color: {
@@ -68,7 +86,7 @@ export const QRDownload: React.FC = () => {
                 />
               </div>
             </div>
-            {capturedVideos.length > 0 && (
+            {/* {capturedVideos.length > 0 && (
               <div className="bg-white rounded-2xl shadow-xl compact-spacing border border-gray-200 mb-6">
                 <div className="flex flex-col gap-4">
                   {capturedVideos
@@ -100,7 +118,7 @@ export const QRDownload: React.FC = () => {
                     ))}
                 </div>
               </div>
-            )}
+            )} */}
             {/*<ImageCanvas selectedImages={capturedImages} fillMode={fillMode}/>*/}
             <div className="flex flex-col items-center">
               <div className="w-48 h-48 border-2 border-[#00167a] rounded-3xl flex items-center justify-center">
@@ -115,7 +133,11 @@ export const QRDownload: React.FC = () => {
               </div>
             </div>
           </div>
-
+          <img
+            src={finalImage}
+            alt="Ảnh đã chọn"
+            className="border rounded shadow mt-10"
+          />
           {/* Nút End */}
           <div className="absolute bottom-8 right-8">
             <button
