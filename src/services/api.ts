@@ -411,7 +411,7 @@ export async function getPaymentQRSuccess(): Promise<any> {
       }
     );
     const data = await response.json();
-    return data.data;
+    return data;
   } catch (error) {
     console.error("Error loading payment methods:", error);
     return [];
